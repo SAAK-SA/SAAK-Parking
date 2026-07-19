@@ -1,10 +1,9 @@
-import { useState } from 'react';
-import { Car, User, Wrench, CheckCircle } from 'lucide-react';
+import { CheckCircle, Car, Bookmark, UserCircle, WrenchIcon } from 'lucide-react';
 import type { ParkingSlot } from '../../types/parking';
 
 const statusConfig: Record<
   ParkingSlot['status'],
-  { bg: string; border: string; icon: React.ElementType; iconColor: string; label: string; textColor: string }
+  { bg: string; border: string; icon: React.ElementType; iconColor: string; label: string }
 > = {
   available: {
     bg: 'bg-green-50 hover:bg-green-100',
@@ -12,73 +11,63 @@ const statusConfig: Record<
     icon: CheckCircle,
     iconColor: 'text-green-500',
     label: 'متاح',
-    textColor: 'text-green-700',
   },
-  employee: {
-    bg: 'bg-brand-navy/5 hover:bg-brand-navy/10',
-    border: 'border-brand-navy/30',
-    icon: User,
-    iconColor: 'text-brand-navy',
-    label: 'موظف',
-    textColor: 'text-brand-navy',
+  occupied: {
+    bg: 'bg-red-50 hover:bg-red-100',
+    border: 'border-red-300',
+    icon: Car,
+    iconColor: 'text-red-500',
+    label: 'مشغول',
+  },
+  reserved: {
+    bg: 'bg-blue-50 hover:bg-blue-100',
+    border: 'border-blue-300',
+    icon: Bookmark,
+    iconColor: 'text-blue-500',
+    label: 'محجوز',
   },
   visitor: {
-    bg: 'bg-amber-50 hover:bg-amber-100',
-    border: 'border-brand-gold/40',
-    icon: Car,
-    iconColor: 'text-brand-gold',
+    bg: 'bg-orange-50 hover:bg-orange-100',
+    border: 'border-orange-300',
+    icon: UserCircle,
+    iconColor: 'text-orange-500',
     label: 'زائر',
-    textColor: 'text-amber-700',
   },
-  outOfService: {
+  disabled: {
     bg: 'bg-gray-50 cursor-not-allowed opacity-60',
     border: 'border-gray-200',
-    icon: Wrench,
+    icon: WrenchIcon,
     iconColor: 'text-gray-400',
     label: 'خارج الخدمة',
-    textColor: 'text-gray-400',
   },
 };
 
-interface SlotTooltipProps {
-  slot: ParkingSlot;
-}
-
-function SlotTooltip({ slot }: SlotTooltipProps) {
-  const cfg = statusConfig[slot.status];
-  return (
-    <div className="absolute z-50 bottom-full mb-2 right-1/2 translate-x-1/2 bg-brand-navy text-white text-xs rounded-xl shadow-xl px-3 py-2 w-44 pointer-events-none">
-      <p className="font-bold mb-1">{slot.number}</p>
-      <p className={`${cfg.textColor} bg-white/10 rounded-lg px-2 py-0.5 inline-block mb-1`}>{cfg.label}</p>
-      {slot.occupant && (
-        <>
-          <p className="text-white/70">لوحة: {slot.occupant.plate}</p>
-          <p className="text-white/70">منذ: {slot.occupant.since}</p>
-        </>
-      )}
-      <div className="absolute top-full right-1/2 translate-x-1/2 -translate-y-px border-4 border-transparent border-t-brand-navy" />
-    </div>
-  );
-}
-
 interface ParkingSlotCellProps {
   slot: ParkingSlot;
+  onClick?: (slot: ParkingSlot) => void;
+  highlighted?: boolean;
 }
 
-export default function ParkingSlotCell({ slot }: ParkingSlotCellProps) {
-  const [hovered, setHovered] = useState(false);
+export default function ParkingSlotCell({ slot, onClick, highlighted }: ParkingSlotCellProps) {
   const cfg = statusConfig[slot.status];
   const Icon = cfg.icon;
 
   return (
     <div
-      className={`relative flex flex-col items-center justify-center w-16 h-16 rounded-xl border ${cfg.bg} ${cfg.border} transition-all duration-150 cursor-pointer group`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onClick={() => slot.status !== 'disabled' && onClick?.(slot)}
+      className={`
+        relative flex flex-col items-center justify-center w-16 h-16 rounded-xl border
+        ${cfg.bg} ${cfg.border}
+        transition-all duration-150
+        ${onClick && slot.status !== 'disabled' ? 'cursor-pointer active:scale-95' : ''}
+        ${highlighted ? 'ring-2 ring-brand-gold ring-offset-1 scale-110 shadow-lg' : ''}
+      `}
+      title={`${slot.number} — ${cfg.label}`}
     >
       <Icon className={`w-5 h-5 ${cfg.iconColor}`} />
-      <span className="text-[10px] font-semibold text-text-secondary mt-0.5 tabular-nums">{slot.number}</span>
-      {hovered && <SlotTooltip slot={slot} />}
+      <span className="text-[10px] font-semibold text-text-secondary mt-0.5 tabular-nums leading-none">
+        {slot.number}
+      </span>
     </div>
   );
 }

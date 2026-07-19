@@ -22,8 +22,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        arabic: ['Tajawal', 'IBM Plex Sans Arabic', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        arabic: ['Tajawal', 'IBM Plex Sans Arabic', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '16px',
