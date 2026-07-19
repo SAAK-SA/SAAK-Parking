@@ -3,7 +3,6 @@ import { Building2, Factory, ShieldCheck, ChevronLeft } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 
 interface BuildingCardProps {
-  id: string;
   nameAr: string;
   nameEn: string;
   icon: React.ElementType;
@@ -17,27 +16,27 @@ function BuildingCard({ nameAr, nameEn, icon: Icon, description, onClick }: Buil
       onClick={onClick}
       className="group relative overflow-hidden text-right w-full
         bg-white/8 backdrop-blur-xl border border-white/15
-        rounded-3xl p-8 md:p-10
-        hover:bg-white/14 hover:border-brand-gold/40
+        rounded-3xl p-7 sm:p-10
+        hover:bg-white/14 hover:border-brand-green/40
         hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)]
         transition-all duration-300 cursor-pointer"
     >
       {/* Glow */}
-      <div className="absolute top-0 left-0 w-32 h-32 bg-brand-gold/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <div className="absolute top-0 left-0 w-32 h-32 bg-brand-green/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
       {/* Icon */}
-      <div className="w-16 h-16 rounded-2xl bg-brand-gold/20 border border-brand-gold/30 flex items-center justify-center mb-6 group-hover:bg-brand-gold/30 transition-colors duration-300">
-        <Icon className="w-8 h-8 text-brand-gold" />
+      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-brand-green/20 border border-brand-green/30 flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-brand-green/30 transition-colors duration-300">
+        <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-brand-green" />
       </div>
 
       {/* Text */}
-      <h3 className="text-white font-bold text-2xl mb-1">{nameAr}</h3>
-      <p className="text-white/50 text-sm mb-6">{nameEn}</p>
+      <h3 className="text-white font-bold text-xl sm:text-2xl mb-1">{nameAr}</h3>
+      <p className="text-white/50 text-sm mb-4 sm:mb-6">{nameEn}</p>
       <p className="text-white/40 text-xs">{description}</p>
 
       {/* Arrow */}
-      <div className="absolute top-1/2 left-8 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:-translate-x-1">
-        <ChevronLeft className="w-6 h-6 text-brand-gold" />
+      <div className="absolute top-1/2 left-6 sm:left-8 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:-translate-x-1">
+        <ChevronLeft className="w-6 h-6 text-brand-green" />
       </div>
     </button>
   );
@@ -49,23 +48,22 @@ export default function Landing() {
   return (
     <PublicLayout>
       {/* Welcome heading */}
-      <div className="text-center mb-12">
-        <p className="text-brand-gold/80 text-sm font-medium tracking-widest uppercase mb-4">
+      <div className="text-center mb-10 sm:mb-12">
+        <p className="text-brand-green/80 text-xs sm:text-sm font-medium tracking-widest uppercase mb-4">
           SAAK Parking Management System
         </p>
-        <h1 className="text-white font-bold text-4xl md:text-5xl mb-3 leading-tight">
+        <h1 className="text-white font-bold text-3xl sm:text-4xl md:text-5xl mb-2 leading-tight">
           مرحباً بكم في
         </h1>
-        <h2 className="text-brand-gold font-bold text-3xl md:text-4xl mb-4">
+        <h2 className="text-brand-green font-bold text-2xl sm:text-3xl md:text-4xl mb-4">
           نظام إدارة مواقف SAAK
         </h2>
-        <p className="text-white/50 text-lg">اختر الوجهة للمتابعة</p>
+        <p className="text-white/50 text-base sm:text-lg">اختر الوجهة للمتابعة</p>
       </div>
 
       {/* Building cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-2xl">
         <BuildingCard
-          id="admin"
           nameAr="مبنى الإدارة"
           nameEn="Administration Building"
           icon={Building2}
@@ -73,7 +71,6 @@ export default function Landing() {
           onClick={() => navigate('/building/admin')}
         />
         <BuildingCard
-          id="factory"
           nameAr="المصنع"
           nameEn="Factory"
           icon={Factory}
@@ -85,7 +82,7 @@ export default function Landing() {
       {/* Admin link */}
       <div className="mt-10">
         <button
-          onClick={() => navigate('/admin')}
+          onClick={() => navigate('/admin/login')}
           className="flex items-center gap-2 text-white/30 hover:text-white/70 text-sm transition-colors"
         >
           <ShieldCheck className="w-4 h-4" />

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Factory Floor Plan Placeholder -->
+<!-- Replace this file with the actual floor plan SVG to enable the interactive parking map -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  <text x="400" y="290" font-family="system-ui" font-size="18" fill="#9CA3AF" text-anchor="middle">
+    Factory — Floor Plan Placeholder
+  </text>
+  <text x="400" y="320" font-family="system-ui" font-size="13" fill="#D1D5DB" text-anchor="middle">
+    Replace with actual SVG floor plan
+  </text>
+</svg>

@@ -39,7 +39,7 @@ export default function ParkingMap({
         {/* Map header */}
         <div className="bg-brand-navy px-6 py-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <BuildingIcon className="w-5 h-5 text-brand-gold" />
+            <BuildingIcon className="w-5 h-5 text-brand-green" />
             <div>
               <h2 className="text-white font-bold text-base">{buildingNameAr ?? 'خريطة المواقف'}</h2>
               <p className="text-white/50 text-xs">خريطة المواقف التفاعلية</p>
@@ -49,7 +49,7 @@ export default function ParkingMap({
             <button
               onClick={() => setSelectedZone(null)}
               className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
-                !selectedZone ? 'bg-brand-gold text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+                !selectedZone ? 'bg-brand-green text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
             >
               الكل
@@ -59,7 +59,7 @@ export default function ParkingMap({
                 key={z.id}
                 onClick={() => setSelectedZone(z.id === selectedZone ? null : z.id)}
                 className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
-                  selectedZone === z.id ? 'bg-brand-gold text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
+                  selectedZone === z.id ? 'bg-brand-green text-white' : 'bg-white/10 text-white/70 hover:bg-white/20'
                 }`}
               >
                 منطقة {z.id}
@@ -71,16 +71,16 @@ export default function ParkingMap({
         {/* Map body */}
         <div className="bg-[#DDE4EF] p-6">
           {/* Entrance */}
-          <div className="flex items-center gap-2 mb-4 bg-brand-gold/20 border border-brand-gold/40 rounded-xl px-4 py-2.5 w-fit">
-            <DoorOpen className="w-4 h-4 text-brand-gold" />
-            <span className="text-sm font-bold text-brand-gold">المدخل الرئيسي</span>
-            <ArrowRight className="w-4 h-4 text-brand-gold" />
+          <div className="flex items-center gap-2 mb-4 bg-brand-green/20 border border-brand-green/40 rounded-xl px-4 py-2.5 w-fit">
+            <DoorOpen className="w-4 h-4 text-brand-green" />
+            <span className="text-sm font-bold text-brand-green">المدخل الرئيسي</span>
+            <ArrowRight className="w-4 h-4 text-brand-green" />
           </div>
 
           {/* Building label */}
           <div className="bg-brand-navy rounded-2xl px-6 py-4 mb-5 w-fit shadow-lg">
             <div className="flex items-center gap-2">
-              <BuildingIcon className="w-4 h-4 text-brand-gold" />
+              <BuildingIcon className="w-4 h-4 text-brand-green" />
               <span className="text-white font-bold text-sm">{buildingNameAr ?? 'SAAK'}</span>
             </div>
           </div>

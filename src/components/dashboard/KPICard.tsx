@@ -19,7 +19,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 const colorMap: Record<KPIStat['color'], { bg: string; icon: string; ring: string; bar: string }> = {
   navy: { bg: 'bg-brand-navy/8', icon: 'text-brand-navy', ring: 'ring-brand-navy/20', bar: 'bg-brand-navy' },
-  gold: { bg: 'bg-brand-gold/10', icon: 'text-brand-gold', ring: 'ring-brand-gold/25', bar: 'bg-brand-gold' },
+  gold: { bg: 'bg-brand-green/10', icon: 'text-brand-green', ring: 'ring-brand-green/25', bar: 'bg-brand-green' },
   green: { bg: 'bg-green-50', icon: 'text-green-600', ring: 'ring-green-200', bar: 'bg-green-500' },
   gray: { bg: 'bg-gray-100', icon: 'text-gray-400', ring: 'ring-gray-200', bar: 'bg-gray-400' },
   red: { bg: 'bg-red-50', icon: 'text-red-600', ring: 'ring-red-200', bar: 'bg-red-500' },

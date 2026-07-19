@@ -39,10 +39,10 @@
            focus:outline-none focus:ring-2 focus:ring-brand-navy/20;
   }
 
-  .btn-warning {
-    @apply bg-brand-gold text-white font-medium px-5 py-2.5 rounded-xl
+  .btn-green {
+    @apply bg-brand-green text-white font-medium px-5 py-2.5 rounded-xl
            hover:bg-opacity-90 active:scale-95 transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-brand-gold/40;
+           focus:outline-none focus:ring-2 focus:ring-brand-green/40;
   }
 
   .btn-destructive {
@@ -79,15 +79,19 @@
     @apply badge bg-green-100 text-green-700;
   }
 
-  .badge-employee {
-    @apply badge bg-blue-100 text-brand-navy;
+  .badge-occupied {
+    @apply badge bg-red-100 text-red-700;
+  }
+
+  .badge-reserved {
+    @apply badge bg-blue-100 text-blue-700;
   }
 
   .badge-visitor {
-    @apply badge bg-amber-100 text-amber-700;
+    @apply badge bg-orange-100 text-orange-700;
   }
 
-  .badge-oos {
+  .badge-disabled {
     @apply badge bg-gray-100 text-gray-500;
   }
 }
