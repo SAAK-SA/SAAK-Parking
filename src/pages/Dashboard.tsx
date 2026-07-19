@@ -74,7 +74,7 @@ export default function Dashboard() {
         <div className="flex flex-wrap gap-3">
           <button className="btn-primary">تسجيل دخول مركبة</button>
           <button className="btn-secondary">تقرير يومي</button>
-          <button className="btn-warning">إيقاف موقف</button>
+          <button className="btn-green">تحديث الحالة</button>
           <button className="btn-destructive">إغلاق طارئ</button>
         </div>
       </section>

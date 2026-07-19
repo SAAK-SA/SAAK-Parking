@@ -6,7 +6,7 @@ export default {
       colors: {
         brand: {
           navy: '#0B2E59',
-          gold: '#C8A45D',
+          green: '#16A34A',
         },
         surface: '#F8FAFC',
         border: '#E5E7EB',
@@ -16,9 +16,10 @@ export default {
         },
         status: {
           available: '#22C55E',
-          employee: '#0B2E59',
-          visitor: '#C8A45D',
-          outOfService: '#9CA3AF',
+          occupied: '#EF4444',
+          reserved: '#3B82F6',
+          visitor: '#F97316',
+          disabled: '#9CA3AF',
         },
       },
       fontFamily: {
