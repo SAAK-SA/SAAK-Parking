@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: 'Tajawal', 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #f0f4f8;
+    color: #1F2937;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-navy text-white font-medium px-5 py-2.5 rounded-xl
+           hover:bg-opacity-90 active:scale-95 transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-brand-navy/40;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-brand-navy border border-brand-navy font-medium px-5 py-2.5 rounded-xl
+           hover:bg-surface active:scale-95 transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-brand-navy/20;
+  }
+
+  .btn-warning {
+    @apply bg-brand-gold text-white font-medium px-5 py-2.5 rounded-xl
+           hover:bg-opacity-90 active:scale-95 transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-brand-gold/40;
+  }
+
+  .btn-destructive {
+    @apply bg-red-600 text-white font-medium px-5 py-2.5 rounded-xl
+           hover:bg-red-700 active:scale-95 transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-red-500/40;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-border/60 p-6;
+  }
+
+  .kpi-card {
+    @apply bg-white rounded-2xl shadow-card border border-border/60 p-6
+           hover:shadow-card-hover transition-shadow duration-200;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+           text-white/70 hover:text-white hover:bg-white/10
+           transition-all duration-150 cursor-pointer;
+  }
+
+  .sidebar-link-active {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+           text-white bg-white/15 border border-white/20;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-available {
+    @apply badge bg-green-100 text-green-700;
+  }
+
+  .badge-employee {
+    @apply badge bg-blue-100 text-brand-navy;
+  }
+
+  .badge-visitor {
+    @apply badge bg-amber-100 text-amber-700;
+  }
+
+  .badge-oos {
+    @apply badge bg-gray-100 text-gray-500;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
