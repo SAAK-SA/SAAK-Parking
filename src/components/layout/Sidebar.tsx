@@ -8,23 +8,27 @@ import {
   Bell,
   LogOut,
   ParkingSquare,
+  UserCheck,
 } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, labelAr: 'لوحة التحكم', labelEn: 'Dashboard' },
-  { to: '/map', icon: Map, labelAr: 'خريطة المواقف', labelEn: 'Parking Map' },
-  { to: '/vehicles', icon: Car, labelAr: 'المركبات', labelEn: 'Vehicles' },
-  { to: '/employees', icon: Users, labelAr: 'الموظفون', labelEn: 'Employees' },
-  { to: '/reports', icon: BarChart3, labelAr: 'التقارير', labelEn: 'Reports' },
+  { to: '/admin', icon: LayoutDashboard, labelAr: 'لوحة التحكم', labelEn: 'Dashboard' },
+  { to: '/admin/map', icon: Map, labelAr: 'خريطة المواقف', labelEn: 'Parking Map' },
+  { to: '/admin/vehicles', icon: Car, labelAr: 'المركبات', labelEn: 'Vehicles' },
+  { to: '/admin/employees', icon: Users, labelAr: 'الموظفون', labelEn: 'Employees' },
+  { to: '/admin/visitors', icon: UserCheck, labelAr: 'الزوار', labelEn: 'Visitors' },
+  { to: '/admin/reports', icon: BarChart3, labelAr: 'التقارير', labelEn: 'Reports' },
 ];
 
 const bottomItems = [
-  { to: '/notifications', icon: Bell, labelAr: 'الإشعارات', labelEn: 'Notifications', badge: 3 },
-  { to: '/settings', icon: Settings, labelAr: 'الإعدادات', labelEn: 'Settings' },
+  { to: '/admin/notifications', icon: Bell, labelAr: 'الإشعارات', badge: 3 },
+  { to: '/admin/settings', icon: Settings, labelAr: 'الإعدادات' },
 ];
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+
   return (
     <aside className="fixed inset-y-0 right-0 w-64 bg-brand-navy flex flex-col z-30 shadow-2xl">
       {/* Logo */}
@@ -34,23 +38,19 @@ export default function Sidebar() {
         </div>
         <div className="leading-tight">
           <p className="text-white font-bold text-base tracking-wide">SAAK</p>
-          <p className="text-white/50 text-xs">نظام إدارة المواقف</p>
+          <p className="text-white/50 text-xs">لوحة تحكم المشرف</p>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 overflow-y-auto scrollbar-hide space-y-1">
-        <p className="text-white/30 text-xs font-medium px-4 pb-2 uppercase tracking-widest">
-          القائمة الرئيسية
-        </p>
+        <p className="text-white/30 text-xs font-medium px-4 pb-2 uppercase tracking-widest">القائمة الرئيسية</p>
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
-            className={({ isActive }) =>
-              isActive ? 'sidebar-link-active' : 'sidebar-link'
-            }
+            end={item.to === '/admin'}
+            className={({ isActive }) => isActive ? 'sidebar-link-active' : 'sidebar-link'}
           >
             <item.icon className="w-4 h-4 flex-shrink-0" />
             <span>{item.labelAr}</span>
@@ -64,9 +64,7 @@ export default function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
-            className={({ isActive }) =>
-              isActive ? 'sidebar-link-active' : 'sidebar-link'
-            }
+            className={({ isActive }) => isActive ? 'sidebar-link-active' : 'sidebar-link'}
           >
             <item.icon className="w-4 h-4 flex-shrink-0" />
             <span className="flex-1">{item.labelAr}</span>
@@ -77,10 +75,16 @@ export default function Sidebar() {
             ) : null}
           </NavLink>
         ))}
-        <button className="sidebar-link w-full text-right">
-          <LogOut className="w-4 h-4 flex-shrink-0" />
-          <span>تسجيل الخروج</span>
-        </button>
+
+        <div className="border-t border-white/10 pt-3 mt-2">
+          <button
+            onClick={() => navigate('/')}
+            className="sidebar-link w-full text-right"
+          >
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            <span>العودة للبوابة</span>
+          </button>
+        </div>
       </div>
     </aside>
   );
