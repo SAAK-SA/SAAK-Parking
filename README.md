@@ -1,32 +1,54 @@
-# React + TypeScript + Vite
+# SAAK Parking — نظام إدارة المواقف
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+نظام إدارة مواقف السيارات لشركة SAAK، مبني بـ React + TypeScript + Tailwind CSS.
 
-Currently, two official plugins are available:
+## تشغيل المشروع محلياً
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+# 1. تثبيت الحزم
+npm install
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# 2. تشغيل خادم التطوير
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+ثم افتح المتصفح على الرابط: **http://localhost:5173**
+
+> ⚠️ **مهم:** لا تفتح ملف `index.html` مباشرة من المجلد — يجب تشغيل `npm run dev` أولاً.
+
+## بناء نسخة الإنتاج
+
+```bash
+npm run build
+npm run preview    # لمعاينة نسخة الإنتاج
+```
+
+## هيكل المشروع
+
+```
+src/
+├── components/
+│   ├── layout/        # Sidebar, Header, Layout
+│   ├── dashboard/     # KPI cards, occupancy chart, events
+│   └── parking/       # Parking map, slot cells
+├── pages/             # Dashboard, ParkingMapPage, Placeholder
+├── data/              # Mock data
+└── types/             # TypeScript types
+```
+
+## التقنيات المستخدمة
+
+- **React 19** + TypeScript
+- **Vite** — بيئة التطوير
+- **Tailwind CSS v3** — التنسيق
+- **Lucide React** — الأيقونات
+- **React Router v7** — التنقل بين الصفحات
+
+## الهوية البصرية
+
+| اللون | الكود | الاستخدام |
+|---|---|---|
+| Navy Blue | `#0B2E59` | اللون الأساسي، الشريط الجانبي |
+| Gold | `#C8A45D` | اللون الثانوي، الإجراءات |
+| Green | `#22C55E` | موقف متاح |
+| Gray | `#9CA3AF` | خارج الخدمة |
