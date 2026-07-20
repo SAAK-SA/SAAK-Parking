@@ -138,7 +138,7 @@ export default function EmployeePortal() {
   return (
     <div className="min-h-screen bg-mesh">
       <div className="bg-white border-b border-border px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-soft sticky top-0 z-10">
-        <Logo tone="color" size={30} showText={false} />
+        <Logo tone="color" size={30} />
         <div className="flex items-center gap-3">
           <div className="text-end hidden sm:block">
             <p className="text-brand-navy font-bold text-sm">{employee!.nameAr}</p>

@@ -14,6 +14,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import ParkingMapPage from './pages/ParkingMapPage';
 import DailyReport from './pages/DailyReport';
+import EmployeesPage from './pages/EmployeesPage';
 import Placeholder from './pages/Placeholder';
 
 export default function App() {
@@ -32,7 +33,7 @@ export default function App() {
       <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/admin/map" element={<ProtectedRoute><ParkingMapPage /></ProtectedRoute>} />
       <Route path="/admin/vehicles" element={<ProtectedRoute><Placeholder titleKey="nav.vehicles" /></ProtectedRoute>} />
-      <Route path="/admin/employees" element={<ProtectedRoute><Placeholder titleKey="nav.employees" /></ProtectedRoute>} />
+      <Route path="/admin/employees" element={<ProtectedRoute><EmployeesPage /></ProtectedRoute>} />
       <Route path="/admin/visitors" element={<ProtectedRoute><Placeholder titleKey="nav.visitors" /></ProtectedRoute>} />
       <Route path="/admin/reports" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
       <Route path="/admin/notifications" element={<ProtectedRoute><Placeholder titleKey="nav.notifications" /></ProtectedRoute>} />

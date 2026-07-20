@@ -195,6 +195,9 @@ export const translations: Record<Lang, Dict> = {
     'slot.since': 'منذ',
     'slot.availableMsg': 'الموقف متاح للاستخدام',
 
+    // Employees management
+    'emp.mgmt.subtitle': 'إدارة بيانات الموظفين والمواقف المخصصة',
+
     // Placeholder
     'placeholder.dev': 'هذه الصفحة قيد التطوير',
   },
@@ -390,6 +393,9 @@ export const translations: Record<Lang, Dict> = {
     'slot.type': 'Type',
     'slot.since': 'Since',
     'slot.availableMsg': 'This spot is available',
+
+    // Employees management
+    'emp.mgmt.subtitle': 'Manage employee records and assigned slots',
 
     // Placeholder
     'placeholder.dev': 'This page is under development',
