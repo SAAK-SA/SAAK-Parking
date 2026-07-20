@@ -2,26 +2,18 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   UserCheck, Building2, Factory, User, Phone, Car,
-  Briefcase, CheckCircle2, Hash, AlertTriangle,
+  Briefcase, CheckCircle2, Hash, AlertTriangle, LogOut,
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import MapPlaceholder from '../components/parking/MapPlaceholder';
 import Logo from '../components/brand/Logo';
 import LanguageToggle from '../components/common/LanguageToggle';
-import type { BuildingId, ParkingSlot } from '../types/parking';
-import { getBuilding, registerVisitor } from '../data/mockData';
+import { FACTORY, visitorCheckIn, checkoutSlot } from '../data/db';
 import { useLanguage } from '../context/LanguageContext';
 
-interface FormData {
-  name: string;
-  company: string;
-  mobile: string;
-  plate: string;
-}
-
+interface FormData { name: string; company: string; mobile: string; plate: string; }
 const initialForm: FormData = { name: '', company: '', mobile: '', plate: '' };
-
-type Step = 'form' | 'success' | 'full';
+type Step = 'form' | 'success' | 'full' | 'left';
 
 export default function VisitorPortal() {
   const { buildingId } = useParams<{ buildingId: string }>();
@@ -31,13 +23,11 @@ export default function VisitorPortal() {
   const [step, setStep] = useState<Step>('form');
   const [form, setForm] = useState<FormData>(initialForm);
   const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [assignedSlot, setAssignedSlot] = useState<ParkingSlot | null>(null);
+  const [slot, setSlot] = useState<string>('');
+  const [busy, setBusy] = useState(false);
 
-  const building = getBuilding(buildingId as BuildingId);
-  if (!building) { navigate('/'); return null; }
-
-  const BuildingIcon = building.id === 'factory' ? Factory : Building2;
-  const buildingName = lang === 'ar' ? building.nameAr : building.name;
+  if (buildingId !== 'factory') { navigate('/'); return null; }
+  const buildingName = lang === 'ar' ? FACTORY.nameAr : FACTORY.name;
 
   const set = (key: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -53,22 +43,33 @@ export default function VisitorPortal() {
     return Object.keys(newErr).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
-    const slot = registerVisitor(building.id, form);
-    if (!slot) { setStep('full'); return; }
-    setAssignedSlot(slot);
+    if (!validate() || busy) return;
+    setBusy(true);
+    const res = await visitorCheckIn(form);
+    setBusy(false);
+    if (!res) { setStep('full'); return; }
+    setSlot(res.slot);
     setStep('success');
   };
 
-  // ── Form ──────────────────────────────────────────────────────────────────
+  const handleCheckout = async () => {
+    if (busy) return;
+    setBusy(true);
+    await checkoutSlot(slot);
+    setBusy(false);
+    setStep('left');
+  };
 
+  const reset = () => { setForm(initialForm); setSlot(''); setStep('form'); };
+
+  // ── Form ──────────────────────────────────────────────────────────────────
   if (step === 'form') {
     return (
-      <PublicLayout showBack backTo={`/building/${building.id}`}>
+      <PublicLayout showBack backTo={`/building/factory`}>
         <div className="animate-fade-in mb-7 flex items-center gap-3 rounded-2xl border border-border bg-white shadow-soft px-5 py-3">
-          <BuildingIcon className="w-5 h-5 text-brand-navy" />
+          <Factory className="w-5 h-5 text-brand-navy" />
           <span className="text-brand-navy font-bold">{buildingName}</span>
           <span className="text-border">|</span>
           <UserCheck className="w-4 h-4 text-text-muted" />
@@ -90,8 +91,8 @@ export default function VisitorPortal() {
             <Field icon={Phone} label={t('vis.mobile')} required placeholder="05xxxxxxxx" value={form.mobile} onChange={set('mobile')} error={errors.mobile} ltr />
             <Field icon={Car} label={t('vis.plate')} required placeholder={t('vis.platePlaceholder')} value={form.plate} onChange={set('plate')} error={errors.plate} />
 
-            <button type="submit" className="btn-green w-full mt-1">
-              <Hash className="w-4 h-4" />
+            <button type="submit" disabled={busy} className="btn-green w-full mt-1 disabled:opacity-60">
+              {busy ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Hash className="w-4 h-4" />}
               {t('vis.assign')}
             </button>
           </form>
@@ -100,25 +101,39 @@ export default function VisitorPortal() {
     );
   }
 
-  // ── No slots available ─────────────────────────────────────────────────────
-
+  // ── Full ────────────────────────────────────────────────────────────────────
   if (step === 'full') {
     return (
-      <PublicLayout showBack backTo={`/building/${building.id}`}>
+      <PublicLayout showBack backTo={`/building/factory`}>
         <div className="w-full max-w-md bg-white border border-border rounded-3xl shadow-card p-10 text-center animate-scale-in">
           <div className="w-20 h-20 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center mx-auto mb-6 animate-pop-in">
             <AlertTriangle className="w-10 h-10 text-orange-500" />
           </div>
           <h2 className="text-brand-navy font-extrabold text-2xl mb-3">{t('vis.full.title')}</h2>
           <p className="text-text-secondary text-sm mb-8 leading-relaxed">{t('vis.full.body', { building: buildingName })}</p>
-          <button onClick={() => setStep('form')} className="btn-secondary w-full">{t('common.retry')}</button>
+          <button onClick={reset} className="btn-secondary w-full">{t('common.retry')}</button>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  // ── Left (checked out) ────────────────────────────────────────────────────
+  if (step === 'left') {
+    return (
+      <PublicLayout showBack backTo={`/building/factory`}>
+        <div className="w-full max-w-md bg-white border border-border rounded-3xl shadow-card p-10 text-center animate-scale-in">
+          <div className="w-20 h-20 rounded-2xl bg-brand-green/10 border border-brand-green/25 flex items-center justify-center mx-auto mb-6 animate-pop-in">
+            <CheckCircle2 className="w-10 h-10 text-brand-green" />
+          </div>
+          <h2 className="text-brand-navy font-extrabold text-2xl mb-3">{t('vis.left.title')}</h2>
+          <p className="text-text-secondary text-sm mb-8 leading-relaxed">{t('vis.left.body', { slot })}</p>
+          <button onClick={reset} className="btn-green w-full">{t('vis.registerAnother')}</button>
         </div>
       </PublicLayout>
     );
   }
 
   // ── Success ────────────────────────────────────────────────────────────────
-
   return (
     <div className="min-h-screen bg-mesh">
       <div className="bg-white border-b border-border px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-soft sticky top-0 z-10">
@@ -132,12 +147,6 @@ export default function VisitorPortal() {
             <UserCheck className="w-4 h-4 text-brand-green" />
           </div>
           <LanguageToggle variant="dark" />
-          <button
-            onClick={() => { setStep('form'); setForm(initialForm); setAssignedSlot(null); }}
-            className="btn-ghost text-sm"
-          >
-            {t('vis.registerAnother')}
-          </button>
         </div>
       </div>
 
@@ -153,16 +162,20 @@ export default function VisitorPortal() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <InfoCard delay={80} icon={Hash} label={t('label.spotNumber')} accent="green" value={<span className="text-2xl font-extrabold text-brand-green">{assignedSlot!.number}</span>} />
-          <InfoCard delay={140} icon={BuildingIcon} label={t('label.building')} accent="navy" value={buildingName} />
+          <InfoCard delay={80} icon={Hash} label={t('label.spotNumber')} accent="green" value={<span className="text-2xl font-extrabold text-brand-green">{slot}</span>} />
+          <InfoCard delay={140} icon={Building2} label={t('label.building')} accent="navy" value={buildingName} />
           <InfoCard delay={200} icon={Car} label={t('label.plate')} accent="gray" value={form.plate} />
-          {form.company && (
-            <InfoCard delay={260} icon={Briefcase} label={t('label.company')} accent="blue" value={form.company} />
-          )}
+          {form.company && <InfoCard delay={260} icon={Briefcase} label={t('label.company')} accent="blue" value={form.company} />}
         </div>
 
+        {/* Checkout */}
+        <button onClick={handleCheckout} disabled={busy} className="btn-destructive w-full disabled:opacity-60">
+          {busy ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <LogOut className="w-4 h-4" />}
+          {t('vis.checkout')}
+        </button>
+
         <div className="animate-fade-up" style={{ animationDelay: '320ms' }}>
-          <MapPlaceholder buildingId={building.id} buildingNameAr={buildingName} assignedSlot={assignedSlot!.number} />
+          <MapPlaceholder buildingId="factory" buildingNameAr={buildingName} assignedSlot={slot} />
         </div>
       </div>
     </div>
@@ -170,7 +183,6 @@ export default function VisitorPortal() {
 }
 
 // ── Info card ────────────────────────────────────────────────────────────────
-
 const accentMap = {
   green: 'bg-brand-green/10 text-brand-green',
   navy: 'bg-brand-navy/10 text-brand-navy',
@@ -178,14 +190,8 @@ const accentMap = {
   gray: 'bg-surface-2 text-text-secondary',
 } as const;
 
-function InfoCard({
-  icon: Icon, label, value, accent, delay,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: React.ReactNode;
-  accent: keyof typeof accentMap;
-  delay: number;
+function InfoCard({ icon: Icon, label, value, accent, delay }: {
+  icon: React.ElementType; label: string; value: React.ReactNode; accent: keyof typeof accentMap; delay: number;
 }) {
   return (
     <div className="animate-fade-up card !p-4 text-center card-hover" style={{ animationDelay: `${delay}ms` }}>
@@ -199,18 +205,10 @@ function InfoCard({
 }
 
 // ── Field ────────────────────────────────────────────────────────────────────
-
 interface FieldProps {
-  icon: React.ElementType;
-  label: string;
-  required?: boolean;
-  placeholder: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  error?: string;
-  ltr?: boolean;
+  icon: React.ElementType; label: string; required?: boolean; placeholder: string;
+  value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; error?: string; ltr?: boolean;
 }
-
 function Field({ icon: Icon, label, required, placeholder, value, onChange, error, ltr }: FieldProps) {
   return (
     <div>
@@ -220,11 +218,7 @@ function Field({ icon: Icon, label, required, placeholder, value, onChange, erro
       <div className="relative">
         <Icon className="absolute top-1/2 start-4 -translate-y-1/2 w-4 h-4 text-text-muted" />
         <input
-          type="text"
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          dir={ltr ? 'ltr' : undefined}
+          type="text" value={value} onChange={onChange} placeholder={placeholder} dir={ltr ? 'ltr' : undefined}
           className={`field ps-10 ${error ? '!border-red-300 focus:!border-red-400 focus:!ring-red-100' : ''}`}
         />
       </div>

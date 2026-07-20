@@ -1,8 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { User, UserCheck, Building2, Factory, ArrowLeft, ArrowRight } from 'lucide-react';
+import { User, UserCheck, Factory, ArrowLeft, ArrowRight } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
-import type { BuildingId } from '../types/parking';
-import { getBuilding } from '../data/mockData';
+import { FACTORY } from '../data/db';
 import { useLanguage } from '../context/LanguageContext';
 
 interface RoleCardProps {
@@ -46,21 +45,19 @@ export default function BuildingSelect() {
   const navigate = useNavigate();
   const { t, lang } = useLanguage();
 
-  const building = getBuilding(buildingId as BuildingId);
-  if (!building) {
+  if (buildingId !== 'factory') {
     navigate('/');
     return null;
   }
 
-  const BuildingIcon = building.id === 'factory' ? Factory : Building2;
-  const buildingName = lang === 'ar' ? building.nameAr : building.name;
+  const buildingName = lang === 'ar' ? FACTORY.nameAr : FACTORY.name;
 
   return (
     <PublicLayout showBack backTo="/">
       {/* Building badge */}
       <div className="animate-fade-in mb-8 flex items-center gap-3 rounded-2xl border border-border bg-white shadow-soft px-5 py-3">
         <div className="w-9 h-9 rounded-xl bg-brand-navy/10 flex items-center justify-center">
-          <BuildingIcon className="w-5 h-5 text-brand-navy" />
+          <Factory className="w-5 h-5 text-brand-navy" />
         </div>
         <span className="text-brand-navy font-bold">{buildingName}</span>
       </div>
@@ -79,7 +76,7 @@ export default function BuildingSelect() {
           description={t('role.employeeDesc')}
           accent="navy"
           delay={160}
-          onClick={() => navigate(`/employee/${building.id}`)}
+          onClick={() => navigate(`/employee/factory`)}
         />
         <RoleCard
           icon={UserCheck}
@@ -87,7 +84,7 @@ export default function BuildingSelect() {
           description={t('role.visitorDesc')}
           accent="green"
           delay={240}
-          onClick={() => navigate(`/visitor/${building.id}`)}
+          onClick={() => navigate(`/visitor/factory`)}
         />
       </div>
     </PublicLayout>
