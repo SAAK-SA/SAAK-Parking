@@ -6,35 +6,41 @@ import {
 } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import MapPlaceholder from '../components/parking/MapPlaceholder';
+import Logo from '../components/brand/Logo';
+import LanguageToggle from '../components/common/LanguageToggle';
 import type { BuildingId, Employee } from '../types/parking';
 import { findEmployee, getBuilding } from '../data/mockData';
+import { useLanguage } from '../context/LanguageContext';
 
 type Step = 'login' | 'success';
 
 export default function EmployeePortal() {
   const { buildingId } = useParams<{ buildingId: string }>();
   const navigate = useNavigate();
-
-  const building = getBuilding(buildingId as BuildingId);
-  if (!building) { navigate('/'); return null; }
-
-  const BuildingIcon = building.id === 'factory' ? Factory : Building2;
+  const { t, lang } = useLanguage();
 
   const [step, setStep] = useState<Step>('login');
   const [employeeId, setEmployeeId] = useState('');
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [error, setError] = useState('');
 
+  const building = getBuilding(buildingId as BuildingId);
+  if (!building) { navigate('/'); return null; }
+
+  const BuildingIcon = building.id === 'factory' ? Factory : Building2;
+  const buildingName = lang === 'ar' ? building.nameAr : building.name;
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     const found = findEmployee(employeeId.trim());
     if (!found) {
-      setError('رقم الموظف غير موجود في النظام. يرجى المراجعة وإعادة المحاولة.');
+      setError(t('emp.err.notfound'));
       return;
     }
     if (found.buildingId !== building.id) {
-      setError(`هذا الموظف مسجل في ${found.buildingId === 'admin' ? 'مبنى الإدارة' : 'المصنع'}، وليس ${building.nameAr}.`);
+      const other = found.buildingId === 'admin' ? t('building.admin.name') : t('building.factory.name');
+      setError(t('emp.err.wrongBuilding', { building: other, current: buildingName }));
       return;
     }
     setEmployee(found);
@@ -53,76 +59,66 @@ export default function EmployeePortal() {
     return (
       <PublicLayout showBack backTo={`/building/${building.id}`}>
         {/* Building badge */}
-        <div className="flex items-center gap-3 mb-8 bg-white/10 backdrop-blur border border-white/15 rounded-2xl px-5 py-3">
-          <BuildingIcon className="w-5 h-5 text-brand-green" />
-          <span className="text-white font-medium">{building.nameAr}</span>
-          <span className="text-white/40 mx-1">·</span>
-          <User className="w-4 h-4 text-white/50" />
-          <span className="text-white/50 text-sm">بوابة الموظف</span>
+        <div className="animate-fade-in mb-7 flex items-center gap-3 rounded-2xl border border-border bg-white shadow-soft px-5 py-3">
+          <BuildingIcon className="w-5 h-5 text-brand-navy" />
+          <span className="text-brand-navy font-bold">{buildingName}</span>
+          <span className="text-border">|</span>
+          <User className="w-4 h-4 text-text-muted" />
+          <span className="text-text-secondary text-sm">{t('portal.employee')}</span>
         </div>
 
         {/* Login card */}
-        <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/15 rounded-3xl p-7 sm:p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-brand-green/20 border border-brand-green/30 flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-brand-green" />
+        <div className="w-full max-w-md bg-white border border-border rounded-3xl shadow-card p-7 sm:p-8 animate-scale-in">
+          <div className="text-center mb-7">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-navy to-brand-navy-light flex items-center justify-center mx-auto mb-4 shadow-glow-blue">
+              <User className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-white font-bold text-2xl mb-1">تسجيل دخول الموظف</h2>
-            <p className="text-white/50 text-sm">أدخل رقم موظفك للوصول إلى موقفك</p>
+            <h2 className="text-brand-navy font-extrabold text-2xl mb-1">{t('emp.login.title')}</h2>
+            <p className="text-text-secondary text-sm">{t('emp.login.subtitle')}</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-white/70 text-sm mb-2">رقم الموظف</label>
+              <label className="block text-text-secondary text-sm font-medium mb-2">{t('emp.field.id')}</label>
               <div className="relative">
-                <Hash className="absolute top-1/2 right-4 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Hash className="absolute top-1/2 start-4 -translate-y-1/2 w-4 h-4 text-text-muted" />
                 <input
                   type="text"
                   value={employeeId}
                   onChange={(e) => { setEmployeeId(e.target.value); setError(''); }}
-                  placeholder="مثال: EMP001"
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3.5 pr-10
-                             text-white placeholder:text-white/30
-                             focus:outline-none focus:border-brand-green/60 focus:ring-1 focus:ring-brand-green/30
-                             transition-colors"
+                  placeholder={t('emp.placeholder')}
+                  className="field ps-10"
                   dir="ltr"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="flex items-start gap-2 bg-red-500/15 border border-red-400/30 rounded-xl p-3">
-                <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-                <p className="text-red-300 text-sm">{error}</p>
+              <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-2xl p-3">
+                <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
 
-            <button type="submit" className="w-full bg-brand-green hover:bg-brand-green/90 text-white font-bold py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2">
+            <button type="submit" className="btn-primary w-full">
               <Search className="w-4 h-4" />
-              بحث عن موقفي
+              {t('emp.search')}
             </button>
           </form>
 
           <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
-            </div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
             <div className="relative flex justify-center">
-              <span className="bg-transparent px-3 text-white/30 text-xs">أو</span>
+              <span className="bg-white px-3 text-text-muted text-xs">{t('common.or')}</span>
             </div>
           </div>
 
-          <button
-            onClick={handleScanCard}
-            className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2"
-          >
+          <button onClick={handleScanCard} className="btn-secondary w-full">
             <CreditCard className="w-5 h-5 text-brand-green" />
-            مسح بطاقة الدخول (تجريبي)
+            {t('emp.scan')}
           </button>
 
-          <p className="text-white/25 text-xs text-center mt-4">
-            هل نسيت رقمك؟ تواصل مع قسم الموارد البشرية
-          </p>
+          <p className="text-text-muted text-xs text-center mt-4">{t('emp.forgot')}</p>
         </div>
       </PublicLayout>
     );
@@ -131,77 +127,82 @@ export default function EmployeePortal() {
   // ── Success screen ─────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#EEF2F7]">
+    <div className="min-h-screen bg-mesh">
       {/* Top bar */}
-      <div className="bg-brand-navy px-4 sm:px-6 py-4 flex items-center justify-between shadow-lg">
+      <div className="bg-white border-b border-border px-4 sm:px-6 py-3.5 flex items-center justify-between shadow-soft sticky top-0 z-10">
+        <Logo tone="color" size={30} showText={false} />
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-brand-green flex items-center justify-center">
-            <User className="w-4 h-4 text-white" />
+          <div className="text-end hidden sm:block">
+            <p className="text-brand-navy font-bold text-sm">{employee!.nameAr}</p>
+            <p className="text-text-secondary text-xs">{employee!.department} · {buildingName}</p>
           </div>
-          <div>
-            <p className="text-white font-bold text-sm">{employee!.nameAr}</p>
-            <p className="text-white/50 text-xs">{employee!.department} · {building.nameAr}</p>
+          <div className="w-9 h-9 rounded-xl bg-brand-navy/10 flex items-center justify-center">
+            <User className="w-4 h-4 text-brand-navy" />
           </div>
+          <LanguageToggle variant="dark" />
+          <button
+            onClick={() => { setStep('login'); setEmployee(null); setEmployeeId(''); }}
+            className="btn-ghost text-sm"
+          >
+            {t('emp.logout')}
+          </button>
         </div>
-        <button
-          onClick={() => { setStep('login'); setEmployee(null); setEmployeeId(''); }}
-          className="text-white/50 hover:text-white text-sm transition-colors"
-        >
-          تسجيل الخروج
-        </button>
       </div>
 
       <div className="max-w-3xl mx-auto p-4 sm:p-6 space-y-5">
         {/* Confirmation banner */}
-        <div className="bg-white rounded-2xl border border-green-200 shadow-card p-4 sm:p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
+        <div className="animate-fade-up bg-white rounded-3xl border border-brand-green/30 shadow-card p-4 sm:p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-brand-green/10 flex items-center justify-center flex-shrink-0 animate-pop-in">
+            <CheckCircle2 className="w-6 h-6 text-brand-green" />
           </div>
           <div>
-            <p className="font-bold text-text-primary text-lg">تم التحقق بنجاح</p>
-            <p className="text-text-secondary text-sm">مرحباً {employee!.nameAr}! موقفك جاهز</p>
+            <p className="font-bold text-brand-navy text-lg">{t('emp.success.title')}</p>
+            <p className="text-text-secondary text-sm">{t('emp.success.hello', { name: employee!.nameAr })}</p>
           </div>
         </div>
 
         {/* Info grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="card text-center !p-4">
-            <div className="w-10 h-10 rounded-xl bg-brand-green/10 flex items-center justify-center mx-auto mb-3">
-              <Hash className="w-5 h-5 text-brand-green" />
-            </div>
-            <p className="text-xs text-text-secondary mb-1">رقم الموقف</p>
-            <p className="text-2xl font-bold text-brand-green">{employee!.assignedSlot}</p>
-          </div>
-          <div className="card text-center !p-4">
-            <div className="w-10 h-10 rounded-xl bg-brand-navy/8 flex items-center justify-center mx-auto mb-3">
-              <BuildingIcon className="w-5 h-5 text-brand-navy" />
-            </div>
-            <p className="text-xs text-text-secondary mb-1">المبنى</p>
-            <p className="text-sm font-bold text-text-primary">{building.nameAr}</p>
-          </div>
-          <div className="card text-center !p-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
-              <Briefcase className="w-5 h-5 text-blue-500" />
-            </div>
-            <p className="text-xs text-text-secondary mb-1">القسم</p>
-            <p className="text-sm font-bold text-text-primary">{employee!.department}</p>
-          </div>
-          <div className="card text-center !p-4">
-            <div className="w-10 h-10 rounded-xl bg-surface flex items-center justify-center mx-auto mb-3">
-              <Car className="w-5 h-5 text-text-secondary" />
-            </div>
-            <p className="text-xs text-text-secondary mb-1">رقم اللوحة</p>
-            <p className="text-sm font-bold text-text-primary">{employee!.plate}</p>
-          </div>
+          <InfoCard delay={80} icon={Hash} label={t('label.spotNumber')} accent="green" value={<span className="text-2xl font-extrabold text-brand-green">{employee!.assignedSlot}</span>} />
+          <InfoCard delay={140} icon={BuildingIcon} label={t('label.building')} accent="navy" value={buildingName} />
+          <InfoCard delay={200} icon={Briefcase} label={t('label.department')} accent="blue" value={employee!.department} />
+          <InfoCard delay={260} icon={Car} label={t('label.plate')} accent="gray" value={employee!.plate} />
         </div>
 
         {/* Map placeholder */}
-        <MapPlaceholder
-          buildingId={building.id}
-          buildingNameAr={building.nameAr}
-          assignedSlot={employee!.assignedSlot}
-        />
+        <div className="animate-fade-up" style={{ animationDelay: '320ms' }}>
+          <MapPlaceholder buildingId={building.id} buildingNameAr={buildingName} assignedSlot={employee!.assignedSlot} />
+        </div>
       </div>
+    </div>
+  );
+}
+
+// ── Info card ────────────────────────────────────────────────────────────────
+
+const accentMap = {
+  green: 'bg-brand-green/10 text-brand-green',
+  navy: 'bg-brand-navy/10 text-brand-navy',
+  blue: 'bg-brand-sky/10 text-brand-sky',
+  gray: 'bg-surface-2 text-text-secondary',
+} as const;
+
+function InfoCard({
+  icon: Icon, label, value, accent, delay,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: React.ReactNode;
+  accent: keyof typeof accentMap;
+  delay: number;
+}) {
+  return (
+    <div className="animate-fade-up card !p-4 text-center card-hover" style={{ animationDelay: `${delay}ms` }}>
+      <div className={`w-10 h-10 rounded-xl ${accentMap[accent]} flex items-center justify-center mx-auto mb-3`}>
+        <Icon className="w-5 h-5" />
+      </div>
+      <p className="text-xs text-text-secondary mb-1">{label}</p>
+      <div className="text-sm font-bold text-brand-navy">{value}</div>
     </div>
   );
 }

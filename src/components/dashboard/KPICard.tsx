@@ -8,6 +8,7 @@ import {
   TrendingDown,
 } from 'lucide-react';
 import type { KPIStat } from '../../types/parking';
+import { useLanguage } from '../../context/LanguageContext';
 
 const iconMap: Record<string, React.ElementType> = {
   LayoutGrid,
@@ -30,6 +31,7 @@ interface KPICardProps {
 }
 
 export default function KPICard({ stat }: KPICardProps) {
+  const { lang, t } = useLanguage();
   const Icon = iconMap[stat.icon] ?? LayoutGrid;
   const c = colorMap[stat.color];
 
@@ -55,18 +57,18 @@ export default function KPICard({ stat }: KPICardProps) {
         )}
       </div>
 
-      <p className="text-3xl font-bold text-text-primary tabular-nums">{stat.value}</p>
+      <p className="text-3xl font-bold text-brand-navy tabular-nums">{stat.value}</p>
 
       {stat.total && (
         <p className="text-xs text-text-secondary mt-0.5">
-          من {stat.total} موقف
+          {t('kpi.of', { total: stat.total })}
           {stat.percentage !== undefined && (
-            <span className="font-medium text-text-primary"> · {stat.percentage}%</span>
+            <span className="font-medium text-brand-navy"> · {stat.percentage}%</span>
           )}
         </p>
       )}
 
-      <p className="text-sm font-medium text-text-secondary mt-3">{stat.labelAr}</p>
+      <p className="text-sm font-medium text-text-secondary mt-3">{lang === 'ar' ? stat.labelAr : stat.labelEn}</p>
 
       {stat.percentage !== undefined && (
         <div className="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">

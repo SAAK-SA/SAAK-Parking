@@ -1,31 +1,24 @@
 import {
-  LayoutDashboard,
-  Map,
-  Car,
-  Users,
-  BarChart3,
-  Settings,
-  Bell,
-  LogOut,
-  ParkingSquare,
-  UserCheck,
-  X,
+  LayoutDashboard, Map, Car, Users, BarChart3, Settings,
+  Bell, LogOut, UserCheck, X, ArrowLeftRight,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import Logo from '../brand/Logo';
 
 const navItems = [
-  { to: '/admin', icon: LayoutDashboard, labelAr: 'لوحة التحكم', labelEn: 'Dashboard' },
-  { to: '/admin/map', icon: Map, labelAr: 'خريطة المواقف', labelEn: 'Parking Map' },
-  { to: '/admin/vehicles', icon: Car, labelAr: 'المركبات', labelEn: 'Vehicles' },
-  { to: '/admin/employees', icon: Users, labelAr: 'الموظفون', labelEn: 'Employees' },
-  { to: '/admin/visitors', icon: UserCheck, labelAr: 'الزوار', labelEn: 'Visitors' },
-  { to: '/admin/reports', icon: BarChart3, labelAr: 'التقارير', labelEn: 'Reports' },
+  { to: '/admin', icon: LayoutDashboard, key: 'nav.dashboard' },
+  { to: '/admin/map', icon: Map, key: 'nav.map' },
+  { to: '/admin/vehicles', icon: Car, key: 'nav.vehicles' },
+  { to: '/admin/employees', icon: Users, key: 'nav.employees' },
+  { to: '/admin/visitors', icon: UserCheck, key: 'nav.visitors' },
+  { to: '/admin/reports', icon: BarChart3, key: 'nav.reports' },
 ];
 
 const bottomItems = [
-  { to: '/admin/notifications', icon: Bell, labelAr: 'الإشعارات', badge: 3 },
-  { to: '/admin/settings', icon: Settings, labelAr: 'الإعدادات' },
+  { to: '/admin/notifications', icon: Bell, key: 'nav.notifications', badge: 3 },
+  { to: '/admin/settings', icon: Settings, key: 'nav.settings' },
 ];
 
 interface SidebarProps {
@@ -36,6 +29,7 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { t } = useLanguage();
 
   const handleLogout = () => {
     logout();
@@ -44,56 +38,46 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <aside
-      className={`fixed inset-y-0 right-0 w-64 bg-brand-navy flex flex-col z-30 shadow-2xl
+      className={`fixed inset-y-0 start-0 w-64 bg-white border-e border-border flex flex-col z-30 shadow-xl
         transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}
+        ${isOpen ? 'translate-x-0' : 'ltr:-translate-x-full rtl:translate-x-full lg:!translate-x-0'}`}
     >
-      {/* Logo + close button */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-white/10">
-        <div className="w-10 h-10 rounded-xl bg-brand-green flex items-center justify-center flex-shrink-0">
-          <ParkingSquare className="w-5 h-5 text-white" strokeWidth={2.5} />
-        </div>
-        <div className="leading-tight flex-1">
-          <p className="text-white font-bold text-base tracking-wide">SAAK</p>
-          <p className="text-white/50 text-xs">لوحة تحكم المشرف</p>
-        </div>
-        <button
-          onClick={onClose}
-          className="lg:hidden text-white/40 hover:text-white transition-colors"
-          aria-label="إغلاق القائمة"
-        >
+      {/* Logo */}
+      <div className="flex items-center justify-between gap-3 px-5 py-5 border-b border-border">
+        <Logo tone="color" size={30} />
+        <button onClick={onClose} className="lg:hidden text-text-muted hover:text-brand-navy transition-colors" aria-label="close">
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 overflow-y-auto scrollbar-hide space-y-1">
-        <p className="text-white/30 text-xs font-medium px-4 pb-2 uppercase tracking-widest">القائمة الرئيسية</p>
+      <nav className="flex-1 px-3.5 py-5 overflow-y-auto scrollbar-hide space-y-1">
+        <p className="text-text-muted text-xs font-semibold px-4 pb-2 uppercase tracking-widest">{t('nav.section')}</p>
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === '/admin'}
             onClick={onClose}
-            className={({ isActive }) => isActive ? 'sidebar-link-active' : 'sidebar-link'}
+            className={({ isActive }) => (isActive ? 'sidebar-link-active' : 'sidebar-link')}
           >
-            <item.icon className="w-4 h-4 flex-shrink-0" />
-            <span>{item.labelAr}</span>
+            <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
+            <span>{t(item.key)}</span>
           </NavLink>
         ))}
       </nav>
 
       {/* Bottom */}
-      <div className="px-4 pb-4 border-t border-white/10 pt-4 space-y-1">
+      <div className="px-3.5 pb-4 border-t border-border pt-4 space-y-1">
         {bottomItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             onClick={onClose}
-            className={({ isActive }) => isActive ? 'sidebar-link-active' : 'sidebar-link'}
+            className={({ isActive }) => (isActive ? 'sidebar-link-active' : 'sidebar-link')}
           >
-            <item.icon className="w-4 h-4 flex-shrink-0" />
-            <span className="flex-1">{item.labelAr}</span>
+            <item.icon className="w-[18px] h-[18px] flex-shrink-0" />
+            <span className="flex-1">{t(item.key)}</span>
             {item.badge ? (
               <span className="w-5 h-5 rounded-full bg-brand-green text-white text-xs flex items-center justify-center font-bold">
                 {item.badge}
@@ -102,20 +86,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </NavLink>
         ))}
 
-        <div className="border-t border-white/10 pt-3 mt-2 space-y-1">
-          <button
-            onClick={() => navigate('/')}
-            className="sidebar-link w-full text-right"
-          >
-            <LogOut className="w-4 h-4 flex-shrink-0" />
-            <span>البوابة العامة</span>
+        <div className="border-t border-border pt-3 mt-2 space-y-1">
+          <button onClick={() => navigate('/')} className="sidebar-link w-full">
+            <ArrowLeftRight className="w-[18px] h-[18px] flex-shrink-0" />
+            <span>{t('nav.publicPortal')}</span>
           </button>
           <button
             onClick={handleLogout}
-            className="sidebar-link w-full text-right text-red-300/70 hover:text-red-300 hover:bg-red-500/10"
+            className="sidebar-link w-full text-red-500 hover:text-red-600 hover:bg-red-50"
           >
-            <LogOut className="w-4 h-4 flex-shrink-0" />
-            <span>تسجيل الخروج</span>
+            <LogOut className="w-[18px] h-[18px] flex-shrink-0" />
+            <span>{t('nav.signout')}</span>
           </button>
         </div>
       </div>

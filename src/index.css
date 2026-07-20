@@ -13,86 +13,159 @@
     font-family: 'Tajawal', 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  html[lang='en'] {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   body {
-    background-color: #f0f4f8;
-    color: #1F2937;
+    background-color: #f6f8fc;
+    color: #132238;
   }
 
   #root {
     width: 100%;
     min-height: 100vh;
   }
+
+  ::selection {
+    background-color: rgba(18, 161, 80, 0.18);
+    color: #0c7c3d;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e6;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a9b6cd;
+    background-clip: content-box;
+  }
 }
 
 @layer components {
+  /* ── Buttons ─────────────────────────────────────────── */
   .btn-primary {
-    @apply bg-brand-navy text-white font-medium px-5 py-2.5 rounded-xl
-           hover:bg-opacity-90 active:scale-95 transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-brand-navy/40;
-  }
-
-  .btn-secondary {
-    @apply bg-white text-brand-navy border border-brand-navy font-medium px-5 py-2.5 rounded-xl
-           hover:bg-surface active:scale-95 transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-brand-navy/20;
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden
+           bg-brand-navy text-white font-semibold px-5 py-3 rounded-2xl
+           shadow-soft hover:shadow-glow-blue hover:-translate-y-0.5
+           active:translate-y-0 transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-brand-navy/30;
   }
 
   .btn-green {
-    @apply bg-brand-green text-white font-medium px-5 py-2.5 rounded-xl
-           hover:bg-opacity-90 active:scale-95 transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-brand-green/40;
+    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden
+           bg-brand-green text-white font-semibold px-5 py-3 rounded-2xl
+           shadow-soft hover:shadow-glow hover:-translate-y-0.5
+           active:translate-y-0 transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-brand-green/30;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-white text-brand-navy border border-border font-semibold px-5 py-3 rounded-2xl
+           hover:border-brand-navy/40 hover:bg-surface hover:-translate-y-0.5
+           active:translate-y-0 transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-brand-navy/15;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           text-text-secondary hover:text-brand-navy hover:bg-surface-2
+           font-medium px-4 py-2.5 rounded-xl transition-all duration-200;
   }
 
   .btn-destructive {
-    @apply bg-red-600 text-white font-medium px-5 py-2.5 rounded-xl
-           hover:bg-red-700 active:scale-95 transition-all duration-150
-           focus:outline-none focus:ring-2 focus:ring-red-500/40;
+    @apply inline-flex items-center justify-center gap-2
+           bg-red-500 text-white font-semibold px-5 py-3 rounded-2xl
+           hover:bg-red-600 hover:-translate-y-0.5 active:translate-y-0
+           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400/40;
   }
 
+  /* Shimmer sweep for primary/green buttons */
+  .btn-primary::after,
+  .btn-green::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.25),
+      transparent
+    );
+    transition: transform 0.7s ease;
+  }
+  .btn-primary:hover::after,
+  .btn-green:hover::after {
+    transform: translateX(120%);
+  }
+
+  /* ── Cards ───────────────────────────────────────────── */
   .card {
-    @apply bg-white rounded-2xl shadow-card border border-border/60 p-6;
+    @apply bg-white rounded-3xl shadow-card border border-border/70 p-6;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1;
   }
 
   .kpi-card {
-    @apply bg-white rounded-2xl shadow-card border border-border/60 p-6
-           hover:shadow-card-hover transition-shadow duration-200;
+    @apply bg-white rounded-3xl shadow-card border border-border/70 p-5
+           transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1;
   }
 
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/60 shadow-soft;
+  }
+
+  /* ── Inputs ──────────────────────────────────────────── */
+  .field {
+    @apply w-full bg-surface border border-border rounded-2xl px-4 py-3.5
+           text-text-primary placeholder:text-text-muted
+           focus:outline-none focus:bg-white focus:border-brand-green
+           focus:ring-4 focus:ring-brand-green/10 transition-all duration-200;
+  }
+
+  /* ── Sidebar (light modern) ──────────────────────────── */
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
-           text-white/70 hover:text-white hover:bg-white/10
-           transition-all duration-150 cursor-pointer;
+    @apply flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium
+           text-text-secondary hover:text-brand-navy hover:bg-surface-2
+           transition-all duration-200 cursor-pointer;
   }
 
   .sidebar-link-active {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
-           text-white bg-white/15 border border-white/20;
+    @apply flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold
+           text-white bg-brand-navy shadow-soft;
   }
 
+  /* ── Badges ──────────────────────────────────────────── */
   .badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
   }
+  .badge-available { @apply badge bg-green-100 text-green-700; }
+  .badge-occupied  { @apply badge bg-red-100 text-red-700; }
+  .badge-reserved  { @apply badge bg-blue-100 text-blue-700; }
+  .badge-visitor   { @apply badge bg-orange-100 text-orange-700; }
+  .badge-disabled  { @apply badge bg-gray-100 text-gray-500; }
 
-  .badge-available {
-    @apply badge bg-green-100 text-green-700;
+  /* ── Gradient text ───────────────────────────────────── */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(120deg, #14396b 0%, #12a150 100%);
   }
-
-  .badge-occupied {
-    @apply badge bg-red-100 text-red-700;
-  }
-
-  .badge-reserved {
-    @apply badge bg-blue-100 text-blue-700;
-  }
-
-  .badge-visitor {
-    @apply badge bg-orange-100 text-orange-700;
-  }
-
-  .badge-disabled {
-    @apply badge bg-gray-100 text-gray-500;
+  .text-gradient-animated {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(120deg, #14396b, #2e5a9e, #12a150, #14396b);
+    background-size: 300% 300%;
+    animation: gradient-shift 6s ease infinite;
   }
 }
 
@@ -103,5 +176,31 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* soft dotted grid backdrop */
+  .bg-dots {
+    background-image: radial-gradient(circle, rgba(20, 57, 107, 0.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  .bg-mesh {
+    background-color: #f6f8fc;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(18, 161, 80, 0.10) 0px, transparent 45%),
+      radial-gradient(at 100% 0%, rgba(46, 90, 158, 0.12) 0px, transparent 45%),
+      radial-gradient(at 100% 100%, rgba(18, 161, 80, 0.08) 0px, transparent 45%),
+      radial-gradient(at 0% 100%, rgba(20, 57, 107, 0.08) 0px, transparent 45%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

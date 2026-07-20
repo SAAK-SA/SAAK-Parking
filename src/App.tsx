@@ -30,12 +30,12 @@ export default function App() {
       {/* ── Admin routes (protected + sidebar) ─────────────── */}
       <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/admin/map" element={<ProtectedRoute><ParkingMapPage /></ProtectedRoute>} />
-      <Route path="/admin/vehicles" element={<ProtectedRoute><Placeholder titleAr="المركبات" titleEn="Vehicles" /></ProtectedRoute>} />
-      <Route path="/admin/employees" element={<ProtectedRoute><Placeholder titleAr="الموظفون" titleEn="Employees" /></ProtectedRoute>} />
-      <Route path="/admin/visitors" element={<ProtectedRoute><Placeholder titleAr="الزوار" titleEn="Visitors" /></ProtectedRoute>} />
-      <Route path="/admin/reports" element={<ProtectedRoute><Placeholder titleAr="التقارير" titleEn="Reports" /></ProtectedRoute>} />
-      <Route path="/admin/notifications" element={<ProtectedRoute><Placeholder titleAr="الإشعارات" titleEn="Notifications" /></ProtectedRoute>} />
-      <Route path="/admin/settings" element={<ProtectedRoute><Placeholder titleAr="الإعدادات" titleEn="Settings" /></ProtectedRoute>} />
+      <Route path="/admin/vehicles" element={<ProtectedRoute><Placeholder titleKey="nav.vehicles" /></ProtectedRoute>} />
+      <Route path="/admin/employees" element={<ProtectedRoute><Placeholder titleKey="nav.employees" /></ProtectedRoute>} />
+      <Route path="/admin/visitors" element={<ProtectedRoute><Placeholder titleKey="nav.visitors" /></ProtectedRoute>} />
+      <Route path="/admin/reports" element={<ProtectedRoute><Placeholder titleKey="nav.reports" /></ProtectedRoute>} />
+      <Route path="/admin/notifications" element={<ProtectedRoute><Placeholder titleKey="nav.notifications" /></ProtectedRoute>} />
+      <Route path="/admin/settings" element={<ProtectedRoute><Placeholder titleKey="nav.settings" /></ProtectedRoute>} />
     </Routes>
   );
 }

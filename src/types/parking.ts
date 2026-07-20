@@ -59,6 +59,7 @@ export interface RecentEvent {
   id: string;
   type: 'entry' | 'exit' | 'alert';
   descriptionAr: string;
+  descriptionEn: string;
   plate: string;
   slot: string;
   time: string;
