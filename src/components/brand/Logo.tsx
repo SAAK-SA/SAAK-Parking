@@ -1,35 +1,22 @@
-import { useLanguage } from '../../context/LanguageContext';
-
-type Tone = 'color' | 'white';
+import React from 'react';
 
 interface LogoProps {
-  tone?: Tone;
-  showText?: boolean;
+  tone?: 'color' | 'white';
   className?: string;
-  /** height of the logo in px */
   size?: number;
 }
 
 export default function Logo({
   tone = 'color',
-  showText = true,
   className = '',
   size = 34,
 }: LogoProps) {
-  const { lang } = useLanguage();
-
-  const textColor =
-    tone === 'white' ? 'text-white' : 'text-brand-navy';
-
-  const subColor =
-    tone === 'white' ? 'text-white/60' : 'text-text-secondary';
-
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <img
-        src={tone === 'white' ? '/logo-white.svg' : '/logo-color.svg'}
-        alt="SAAK"
-        style={{ height: size }}
-        className="w-auto object-contain"
-      />
+    <img
+      src={tone === 'white' ? '/logo-white.svg' : '/logo-color.svg'}
+      alt="SAAK"
+      style={{ height: size }}
+      className={`w-auto object-contain ${className}`}
+    />
+  );
 }
