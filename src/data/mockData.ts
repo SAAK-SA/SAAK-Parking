@@ -69,18 +69,85 @@ const factoryZones: ParkingZone[] = [
   },
 ];
 
-export const buildings: BuildingData[] = [
-  { id: 'factory', name: 'Factory', nameAr: 'المصنع', zones: factoryZones },
+// Static building metadata (names never change)
+const buildingsMeta: { id: BuildingId; name: string; nameAr: string }[] = [
+  { id: 'factory', name: 'Factory', nameAr: 'المصنع' },
 ];
+
+// ─── Persistent store (localStorage) ─────────────────────────────────────────
+// Simple, no-backend data layer: seeds from the mock data on first run, then
+// saves every change to the browser so registrations survive reloads. Swap this
+// section for real API/DB calls later without touching the components.
+
+const STORAGE_KEY = 'saak_data_v1';
+
+interface StoreState {
+  zones: ParkingZone[];
+  visitors: VisitorRecord[];
+}
+
+export interface VisitorRecord {
+  id: string;
+  name: string;
+  company: string;
+  mobile: string;
+  plate: string;
+  buildingId: BuildingId;
+  slot: string;
+  createdAt: string;
+}
+
+function clone<T>(v: T): T {
+  return JSON.parse(JSON.stringify(v)) as T;
+}
+
+function seed(): StoreState {
+  return { zones: clone(factoryZones), visitors: [] };
+}
+
+function load(): StoreState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as StoreState;
+  } catch {
+    /* ignore corrupt/unavailable storage */
+  }
+  const fresh = seed();
+  save(fresh);
+  return fresh;
+}
+
+function save(s: StoreState): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  } catch {
+    /* storage full or unavailable — keep working in-memory */
+  }
+}
+
+let state: StoreState = load();
+
+/** Reset the store back to the seed data. */
+export function resetData(): void {
+  state = seed();
+  save(state);
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function getBuilding(id: BuildingId): BuildingData {
-  return buildings.find((b) => b.id === id)!;
+export const buildings: BuildingData[] = buildingsMeta.map((m) => ({
+  ...m,
+  zones: factoryZones,
+}));
+
+export function getBuilding(id: BuildingId): BuildingData | undefined {
+  const meta = buildingsMeta.find((b) => b.id === id);
+  if (!meta) return undefined;
+  return { ...meta, zones: getBuildingZones(id) };
 }
 
 export function getBuildingZones(id: BuildingId): ParkingZone[] {
-  return getBuilding(id).zones;
+  return state.zones.filter((z) => z.buildingId === id);
 }
 
 export function getBuildingStats(id: BuildingId): KPIStat[] {
@@ -108,10 +175,55 @@ export function findEmployee(id: string): Employee | undefined {
   return employees.find((e) => e.id.toLowerCase() === id.toLowerCase());
 }
 
+function visitorZoneId(buildingId: BuildingId): string {
+  return buildingId === 'admin' ? 'B' : 'E';
+}
+
 export function getFirstAvailableVisitorSlot(buildingId: BuildingId): ParkingSlot | undefined {
-  const zones = getBuildingZones(buildingId);
-  const visitorZone = zones.find((z) => z.id === (buildingId === 'admin' ? 'B' : 'E'));
-  return visitorZone?.slots.find((s) => s.status === 'available');
+  const zone = state.zones.find((z) => z.buildingId === buildingId && z.id === visitorZoneId(buildingId));
+  return zone?.slots.find((s) => s.status === 'available');
+}
+
+export function getVisitors(): VisitorRecord[] {
+  return state.visitors;
+}
+
+/**
+ * Register a visitor: reserves the first free visitor slot, marks it occupied,
+ * saves the record, and persists everything. Returns the assigned slot, or
+ * `null` when the visitor zone is full.
+ */
+export function registerVisitor(
+  buildingId: BuildingId,
+  form: { name: string; company: string; mobile: string; plate: string },
+): ParkingSlot | null {
+  const zone = state.zones.find((z) => z.buildingId === buildingId && z.id === visitorZoneId(buildingId));
+  const slot = zone?.slots.find((s) => s.status === 'available');
+  if (!slot) return null;
+
+  const since = new Date().toTimeString().slice(0, 5);
+  slot.status = 'visitor';
+  slot.occupant = {
+    name: form.name,
+    type: 'visitor',
+    plate: form.plate,
+    since,
+    company: form.company || undefined,
+  };
+
+  state.visitors.push({
+    id: `V${Date.now()}`,
+    name: form.name,
+    company: form.company,
+    mobile: form.mobile,
+    plate: form.plate,
+    buildingId,
+    slot: slot.number,
+    createdAt: new Date().toISOString(),
+  });
+
+  save(state);
+  return slot;
 }
 
 // ─── Legacy exports for existing components ───────────────────────────────────

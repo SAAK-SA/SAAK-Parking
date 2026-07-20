@@ -12,7 +12,7 @@ export default function Dashboard() {
 
   const stats = getBuildingStats('factory');
   const zones = getBuildingZones('factory');
-  const building = getBuilding('factory');
+  const building = getBuilding('factory')!;
   const buildingName = lang === 'ar' ? building.nameAr : building.name;
 
   return (

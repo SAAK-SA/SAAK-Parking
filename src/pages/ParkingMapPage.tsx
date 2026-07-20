@@ -7,7 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 export default function ParkingMapPage() {
   const { lang } = useLanguage();
   const zones = getBuildingZones('factory');
-  const building = getBuilding('factory');
+  const building = getBuilding('factory')!;
   const buildingName = lang === 'ar' ? building.nameAr : building.name;
 
   return (

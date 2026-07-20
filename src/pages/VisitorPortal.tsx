@@ -9,7 +9,7 @@ import MapPlaceholder from '../components/parking/MapPlaceholder';
 import Logo from '../components/brand/Logo';
 import LanguageToggle from '../components/common/LanguageToggle';
 import type { BuildingId, ParkingSlot } from '../types/parking';
-import { getBuilding, getFirstAvailableVisitorSlot } from '../data/mockData';
+import { getBuilding, registerVisitor } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
 
 interface FormData {
@@ -56,7 +56,7 @@ export default function VisitorPortal() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    const slot = getFirstAvailableVisitorSlot(building.id);
+    const slot = registerVisitor(building.id, form);
     if (!slot) { setStep('full'); return; }
     setAssignedSlot(slot);
     setStep('success');
