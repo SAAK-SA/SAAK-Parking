@@ -47,3 +47,12 @@ export async function sbUpdate(table: string, query: string, patch: object): Pro
   });
   if (!res.ok) throw new Error(`Supabase update ${table}: ${res.status} ${await res.text()}`);
 }
+
+/** DELETE rows matching `query` (PostgREST filter). */
+export async function sbDelete(table: string, query: string): Promise<void> {
+  const res = await fetch(`${URL}/rest/v1/${table}?${query}`, {
+    method: 'DELETE',
+    headers: headers({ Prefer: 'return=minimal' }),
+  });
+  if (!res.ok) throw new Error(`Supabase delete ${table}: ${res.status} ${await res.text()}`);
+}

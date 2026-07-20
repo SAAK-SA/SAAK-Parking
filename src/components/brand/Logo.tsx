@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface LogoProps {
   tone?: 'color' | 'white';
   className?: string;

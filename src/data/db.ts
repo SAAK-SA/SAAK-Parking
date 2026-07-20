@@ -4,7 +4,7 @@ import {
   seedSlots, seedEmployees,
   type SlotRow, type SessionRow,
 } from './seed';
-import { isCloud, sbSelect, sbInsert, sbUpdate } from '../lib/cloud';
+import { isCloud, sbSelect, sbInsert, sbUpdate, sbDelete } from '../lib/cloud';
 
 export { FACTORY };
 export const usingCloud = isCloud;
@@ -223,6 +223,43 @@ export async function visitorCheckIn(form: VisitorForm): Promise<{ slot: string 
   });
   saveLocal(local);
   return { slot: row.number };
+}
+
+/** Add a new employee. */
+export async function addEmployee(emp: Employee): Promise<void> {
+  if (isCloud) {
+    await sbInsert('employees', {
+      id: emp.id, name: emp.nameAr, department: emp.department,
+      plate: emp.plate, assigned_slot: emp.assignedSlot, building: emp.buildingId,
+    });
+  } else {
+    local.employees.push(emp);
+    saveLocal(local);
+  }
+}
+
+/** Update an existing employee (matched by id). */
+export async function updateEmployee(emp: Employee): Promise<void> {
+  if (isCloud) {
+    await sbUpdate('employees', `id=eq.${emp.id}`, {
+      name: emp.nameAr, department: emp.department,
+      plate: emp.plate, assigned_slot: emp.assignedSlot,
+    });
+  } else {
+    const idx = local.employees.findIndex((e) => e.id === emp.id);
+    if (idx !== -1) local.employees[idx] = emp;
+    saveLocal(local);
+  }
+}
+
+/** Delete an employee by id. */
+export async function deleteEmployee(id: string): Promise<void> {
+  if (isCloud) {
+    await sbDelete('employees', `id=eq.${id}`);
+  } else {
+    local.employees = local.employees.filter((e) => e.id !== id);
+    saveLocal(local);
+  }
 }
 
 export async function getSessions(opts: { todayOnly?: boolean } = {}): Promise<SessionRow[]> {
