@@ -1,57 +1,17 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Factory, ShieldCheck, Zap, LayoutGrid, Lock, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Factory, ShieldCheck, ArrowLeft, ArrowRight, ImageIcon } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
 import { useLanguage } from '../context/LanguageContext';
 
-interface BuildingCardProps {
-  name: string;
-  icon: React.ElementType;
-  description: string;
-  accent: 'navy' | 'green';
-  delay: number;
-  onClick: () => void;
-}
-
-function BuildingCard({ name, icon: Icon, description, accent, delay, onClick }: BuildingCardProps) {
-  const { dir } = useLanguage();
-  const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
-  const accentBg = accent === 'green' ? 'bg-brand-green' : 'bg-brand-navy';
-  const accentSoft = accent === 'green' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-navy/10 text-brand-navy';
-  const hoverBorder = accent === 'green' ? 'hover:border-brand-green/40' : 'hover:border-brand-navy/40';
-
-  return (
-    <button
-      onClick={onClick}
-      style={{ animationDelay: `${delay}ms` }}
-      className={`group relative overflow-hidden text-start w-full animate-fade-up
-        bg-white border border-border rounded-3xl p-7 sm:p-8 shadow-card card-hover ${hoverBorder}`}
-    >
-      {/* corner glow */}
-      <div className={`absolute -top-16 -end-16 w-40 h-40 rounded-full ${accentBg} opacity-0 group-hover:opacity-[0.08] blur-2xl transition-opacity duration-500`} />
-
-      <div className={`w-16 h-16 rounded-2xl ${accentSoft} flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
-        <Icon className="w-8 h-8" />
-      </div>
-
-      <h3 className="text-brand-navy font-bold text-xl sm:text-2xl mb-1">{name}</h3>
-      <p className="text-text-secondary text-sm mb-6 leading-relaxed">{description}</p>
-
-      <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${accentSoft} transition-all duration-300 group-hover:scale-110`}>
-        <Arrow className="w-5 h-5" />
-      </div>
-    </button>
-  );
-}
-
-const features = [
-  { icon: Zap, key: 'fast' },
-  { icon: LayoutGrid, key: 'smart' },
-  { icon: Lock, key: 'secure' },
-] as const;
+/** Path to the factory photo — drop the real image here to replace the placeholder */
+const FACTORY_IMAGE = '/factory.jpg';
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { t, lang } = useLanguage();
+  const { t, dir } = useLanguage();
+  const [imgOk, setImgOk] = useState(true);
+  const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
 
   return (
     <PublicLayout>
@@ -65,7 +25,7 @@ export default function Landing() {
       </div>
 
       {/* Heading */}
-      <div className="text-center mb-10 max-w-2xl animate-fade-up" style={{ animationDelay: '80ms' }}>
+      <div className="text-center mb-9 max-w-2xl animate-fade-up" style={{ animationDelay: '80ms' }}>
         <h1 className="text-text-secondary font-medium text-lg sm:text-xl mb-2">{t('landing.welcome')}</h1>
         <h2 className="text-gradient-animated font-extrabold text-4xl sm:text-5xl md:text-6xl mb-4 leading-[1.3] pb-1">
           {t('landing.title')}
@@ -73,50 +33,57 @@ export default function Landing() {
         <p className="text-text-secondary text-base sm:text-lg">{t('landing.subtitle')}</p>
       </div>
 
-      {/* Building cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-2xl mb-10">
-        <BuildingCard
-          name={t('building.admin.name')}
-          icon={Building2}
-          description={t('building.admin.desc')}
-          accent="navy"
-          delay={160}
-          onClick={() => navigate('/building/admin')}
-        />
-        <BuildingCard
-          name={t('building.factory.name')}
-          icon={Factory}
-          description={t('building.factory.desc')}
-          accent="green"
-          delay={240}
-          onClick={() => navigate('/building/factory')}
-        />
-      </div>
-
-      {/* Feature chips */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-2xl mb-10">
-        {features.map((f, i) => (
-          <div
-            key={f.key}
-            style={{ animationDelay: `${320 + i * 80}ms` }}
-            className="animate-fade-up flex items-center gap-3 rounded-2xl bg-white/70 backdrop-blur border border-border/70 px-4 py-3"
-          >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-navy to-brand-green flex items-center justify-center flex-shrink-0">
-              <f.icon className="w-4 h-4 text-white" />
+      {/* Factory card with image area */}
+      <div
+        className="group w-full max-w-xl animate-fade-up bg-white border border-border rounded-3xl shadow-card card-hover overflow-hidden"
+        style={{ animationDelay: '160ms' }}
+      >
+        {/* ── Image banner (replace /public/factory.jpg to show the real photo) ── */}
+        <div className="relative h-52 sm:h-64 overflow-hidden bg-gradient-to-br from-brand-navy via-brand-navy-light to-brand-green">
+          {imgOk ? (
+            <img
+              src={FACTORY_IMAGE}
+              alt={t('building.factory.name')}
+              onError={() => setImgOk(false)}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white/90">
+              {/* subtle pattern */}
+              <div className="absolute inset-0 bg-dots opacity-30" />
+              <div className="relative w-16 h-16 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center backdrop-blur-sm">
+                <ImageIcon className="w-8 h-8" />
+              </div>
+              <p className="relative text-sm font-semibold">{t('factory.imagePlaceholder')}</p>
+              <p className="relative text-xs text-white/70 px-6 text-center">{t('factory.imageHint')}</p>
             </div>
-            <div className={lang === 'ar' ? 'text-right' : 'text-left'}>
-              <p className="text-sm font-bold text-brand-navy leading-tight">{t(`landing.feature.${f.key}`)}</p>
-              <p className="text-xs text-text-muted">{t(`landing.feature.${f.key}Desc`)}</p>
-            </div>
+          )}
+          {/* factory chip */}
+          <div className="absolute top-4 start-4 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-3 py-1.5 shadow-soft">
+            <Factory className="w-4 h-4 text-brand-green" />
+            <span className="text-xs font-bold text-brand-navy">{t('building.factory.name')}</span>
           </div>
-        ))}
+        </div>
+
+        {/* ── Body ── */}
+        <div className="p-6 sm:p-8">
+          <h3 className="text-brand-navy font-bold text-2xl mb-2">{t('building.factory.name')}</h3>
+          <p className="text-text-secondary text-sm mb-6 leading-relaxed">{t('building.factory.desc')}</p>
+          <button
+            onClick={() => navigate('/building/factory')}
+            className="btn-green w-full text-base py-4"
+          >
+            {t('landing.enter')}
+            <Arrow className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Admin link */}
       <button
         onClick={() => navigate('/admin/login')}
-        className="animate-fade-in flex items-center gap-2 text-text-muted hover:text-brand-navy text-sm font-medium transition-colors"
-        style={{ animationDelay: '560ms' }}
+        className="animate-fade-in mt-8 flex items-center gap-2 text-text-muted hover:text-brand-navy text-sm font-medium transition-colors"
+        style={{ animationDelay: '320ms' }}
       >
         <ShieldCheck className="w-4 h-4" />
         <span>{t('landing.adminLogin')}</span>
