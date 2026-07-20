@@ -32,26 +32,4 @@ export default function Logo({
         style={{ height: size }}
         className="w-auto object-contain"
       />
-
-      {showText && (
-        <div className="leading-tight">
-          <p
-            className={`font-extrabold tracking-tight ${textColor}`}
-            style={{ fontSize: size * 0.5 }}
-          >
-            SAAK
-          </p>
-
-          <p
-            className={`${subColor} font-medium`}
-            style={{ fontSize: size * 0.26 }}
-          >
-            {lang === 'ar'
-              ? 'ساك الدولية'
-              : 'International'}
-          </p>
-        </div>
-      )}
-    </div>
-  );
 }
