@@ -1,5 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#0B2E59"/>
-  <rect x="8" y="8" width="16" height="16" rx="4" fill="#C8A45D"/>
-  <text x="16" y="21" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="white">P</text>
+<svg width="64" height="64" viewBox="0 0 150 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M30 90 L64 24 L98 90" stroke="#14396B" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+  <path d="M58 90 L90 30 L122 90" stroke="#12A150" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+  <path d="M98 90 L122 46 L146 90 Z" fill="#14396B"/>
+  <g stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" fill="none">
+    <path d="M122 84 L122 70"/>
+    <path d="M122 70 Q112 66 106 70"/>
+    <path d="M122 70 Q114 61 108 61"/>
+    <path d="M122 70 Q122 60 122 56"/>
+    <path d="M122 70 Q130 61 136 61"/>
+    <path d="M122 70 Q132 66 138 70"/>
+  </g>
 </svg>

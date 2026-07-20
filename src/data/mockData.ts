@@ -161,10 +161,10 @@ export function getFirstAvailableVisitorSlot(buildingId: BuildingId): ParkingSlo
 // ─── Legacy exports for existing components ───────────────────────────────────
 
 export const recentEvents: RecentEvent[] = [
-  { id: '1', type: 'entry', descriptionAr: 'دخول موظف', plate: 'أ ب ج ١٢٣٤', slot: 'A01', time: '09:42' },
-  { id: '2', type: 'exit', descriptionAr: 'خروج زائر', plate: 'ل م ن ٩٩٠٠', slot: 'B02', time: '09:38' },
-  { id: '3', type: 'entry', descriptionAr: 'دخول زائر', plate: 'هـ و ز ١١٢٢', slot: 'B03', time: '09:31' },
-  { id: '4', type: 'alert', descriptionAr: 'موقف خارج الخدمة', plate: '—', slot: 'F03', time: '08:55' },
-  { id: '5', type: 'entry', descriptionAr: 'دخول VIP', plate: 'م ن س ٧٨٩٠', slot: 'C02', time: '07:20' },
-  { id: '6', type: 'exit', descriptionAr: 'خروج موظف', plate: 'د هـ و ٥٦٧٨', slot: 'A02', time: '07:10' },
+  { id: '1', type: 'entry', descriptionAr: 'دخول موظف', descriptionEn: 'Employee entry', plate: 'أ ب ج ١٢٣٤', slot: 'A01', time: '09:42' },
+  { id: '2', type: 'exit', descriptionAr: 'خروج زائر', descriptionEn: 'Visitor exit', plate: 'ل م ن ٩٩٠٠', slot: 'B02', time: '09:38' },
+  { id: '3', type: 'entry', descriptionAr: 'دخول زائر', descriptionEn: 'Visitor entry', plate: 'هـ و ز ١١٢٢', slot: 'B03', time: '09:31' },
+  { id: '4', type: 'alert', descriptionAr: 'موقف خارج الخدمة', descriptionEn: 'Spot out of service', plate: '—', slot: 'F03', time: '08:55' },
+  { id: '5', type: 'entry', descriptionAr: 'دخول VIP', descriptionEn: 'VIP entry', plate: 'م ن س ٧٨٩٠', slot: 'C02', time: '07:20' },
+  { id: '6', type: 'exit', descriptionAr: 'خروج موظف', descriptionEn: 'Employee exit', plate: 'د هـ و ٥٦٧٨', slot: 'A02', time: '07:10' },
 ];

@@ -1,94 +1,126 @@
 import { useNavigate } from 'react-router-dom';
-import { Building2, Factory, ShieldCheck, ChevronLeft } from 'lucide-react';
+import { Building2, Factory, ShieldCheck, Zap, LayoutGrid, Lock, ArrowLeft, ArrowRight } from 'lucide-react';
 import PublicLayout from '../components/layout/PublicLayout';
+import { useLanguage } from '../context/LanguageContext';
 
 interface BuildingCardProps {
-  nameAr: string;
-  nameEn: string;
+  name: string;
   icon: React.ElementType;
   description: string;
+  accent: 'navy' | 'green';
+  delay: number;
   onClick: () => void;
 }
 
-function BuildingCard({ nameAr, nameEn, icon: Icon, description, onClick }: BuildingCardProps) {
+function BuildingCard({ name, icon: Icon, description, accent, delay, onClick }: BuildingCardProps) {
+  const { dir } = useLanguage();
+  const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
+  const accentBg = accent === 'green' ? 'bg-brand-green' : 'bg-brand-navy';
+  const accentSoft = accent === 'green' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-navy/10 text-brand-navy';
+  const hoverBorder = accent === 'green' ? 'hover:border-brand-green/40' : 'hover:border-brand-navy/40';
+
   return (
     <button
       onClick={onClick}
-      className="group relative overflow-hidden text-right w-full
-        bg-white/8 backdrop-blur-xl border border-white/15
-        rounded-3xl p-7 sm:p-10
-        hover:bg-white/14 hover:border-brand-green/40
-        hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)]
-        transition-all duration-300 cursor-pointer"
+      style={{ animationDelay: `${delay}ms` }}
+      className={`group relative overflow-hidden text-start w-full animate-fade-up
+        bg-white border border-border rounded-3xl p-7 sm:p-8 shadow-card card-hover ${hoverBorder}`}
     >
-      {/* Glow */}
-      <div className="absolute top-0 left-0 w-32 h-32 bg-brand-green/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      {/* corner glow */}
+      <div className={`absolute -top-16 -end-16 w-40 h-40 rounded-full ${accentBg} opacity-0 group-hover:opacity-[0.08] blur-2xl transition-opacity duration-500`} />
 
-      {/* Icon */}
-      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-brand-green/20 border border-brand-green/30 flex items-center justify-center mb-5 sm:mb-6 group-hover:bg-brand-green/30 transition-colors duration-300">
-        <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-brand-green" />
+      <div className={`w-16 h-16 rounded-2xl ${accentSoft} flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
+        <Icon className="w-8 h-8" />
       </div>
 
-      {/* Text */}
-      <h3 className="text-white font-bold text-xl sm:text-2xl mb-1">{nameAr}</h3>
-      <p className="text-white/50 text-sm mb-4 sm:mb-6">{nameEn}</p>
-      <p className="text-white/40 text-xs">{description}</p>
+      <h3 className="text-brand-navy font-bold text-xl sm:text-2xl mb-1">{name}</h3>
+      <p className="text-text-secondary text-sm mb-6 leading-relaxed">{description}</p>
 
-      {/* Arrow */}
-      <div className="absolute top-1/2 left-6 sm:left-8 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:-translate-x-1">
-        <ChevronLeft className="w-6 h-6 text-brand-green" />
+      <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${accentSoft} transition-all duration-300 group-hover:scale-110`}>
+        <Arrow className="w-5 h-5" />
       </div>
     </button>
   );
 }
 
+const features = [
+  { icon: Zap, key: 'fast' },
+  { icon: LayoutGrid, key: 'smart' },
+  { icon: Lock, key: 'secure' },
+] as const;
+
 export default function Landing() {
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
 
   return (
     <PublicLayout>
-      {/* Welcome heading */}
-      <div className="text-center mb-10 sm:mb-12">
-        <p className="text-brand-green/80 text-xs sm:text-sm font-medium tracking-widest uppercase mb-4">
-          SAAK Parking Management System
-        </p>
-        <h1 className="text-white font-bold text-3xl sm:text-4xl md:text-5xl mb-2 leading-tight">
-          مرحباً بكم في
-        </h1>
-        <h2 className="text-brand-green font-bold text-2xl sm:text-3xl md:text-4xl mb-4">
-          نظام إدارة مواقف SAAK
+      {/* Badge */}
+      <div className="animate-fade-in mb-6 inline-flex items-center gap-2 rounded-full border border-brand-green/20 bg-brand-green/8 px-4 py-1.5">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green opacity-60" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-green" />
+        </span>
+        <span className="text-brand-green text-xs font-semibold tracking-wide">{t('landing.badge')}</span>
+      </div>
+
+      {/* Heading */}
+      <div className="text-center mb-10 max-w-2xl animate-fade-up" style={{ animationDelay: '80ms' }}>
+        <h1 className="text-text-secondary font-medium text-lg sm:text-xl mb-2">{t('landing.welcome')}</h1>
+        <h2 className="text-gradient-animated font-extrabold text-4xl sm:text-5xl md:text-6xl mb-4 leading-[1.3] pb-1">
+          {t('landing.title')}
         </h2>
-        <p className="text-white/50 text-base sm:text-lg">اختر الوجهة للمتابعة</p>
+        <p className="text-text-secondary text-base sm:text-lg">{t('landing.subtitle')}</p>
       </div>
 
       {/* Building cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-2xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-2xl mb-10">
         <BuildingCard
-          nameAr="مبنى الإدارة"
-          nameEn="Administration Building"
+          name={t('building.admin.name')}
           icon={Building2}
-          description="مواقف الموظفين والزوار لمبنى الإدارة"
+          description={t('building.admin.desc')}
+          accent="navy"
+          delay={160}
           onClick={() => navigate('/building/admin')}
         />
         <BuildingCard
-          nameAr="المصنع"
-          nameEn="Factory"
+          name={t('building.factory.name')}
           icon={Factory}
-          description="مواقف الموظفين والزوار للمصنع"
+          description={t('building.factory.desc')}
+          accent="green"
+          delay={240}
           onClick={() => navigate('/building/factory')}
         />
       </div>
 
-      {/* Admin link */}
-      <div className="mt-10">
-        <button
-          onClick={() => navigate('/admin/login')}
-          className="flex items-center gap-2 text-white/30 hover:text-white/70 text-sm transition-colors"
-        >
-          <ShieldCheck className="w-4 h-4" />
-          <span>دخول المشرفين</span>
-        </button>
+      {/* Feature chips */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-2xl mb-10">
+        {features.map((f, i) => (
+          <div
+            key={f.key}
+            style={{ animationDelay: `${320 + i * 80}ms` }}
+            className="animate-fade-up flex items-center gap-3 rounded-2xl bg-white/70 backdrop-blur border border-border/70 px-4 py-3"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-navy to-brand-green flex items-center justify-center flex-shrink-0">
+              <f.icon className="w-4 h-4 text-white" />
+            </div>
+            <div className={lang === 'ar' ? 'text-right' : 'text-left'}>
+              <p className="text-sm font-bold text-brand-navy leading-tight">{t(`landing.feature.${f.key}`)}</p>
+              <p className="text-xs text-text-muted">{t(`landing.feature.${f.key}Desc`)}</p>
+            </div>
+          </div>
+        ))}
       </div>
+
+      {/* Admin link */}
+      <button
+        onClick={() => navigate('/admin/login')}
+        className="animate-fade-in flex items-center gap-2 text-text-muted hover:text-brand-navy text-sm font-medium transition-colors"
+        style={{ animationDelay: '560ms' }}
+      >
+        <ShieldCheck className="w-4 h-4" />
+        <span>{t('landing.adminLogin')}</span>
+      </button>
     </PublicLayout>
   );
 }
