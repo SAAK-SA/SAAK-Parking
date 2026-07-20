@@ -63,7 +63,7 @@ export default function Header({ titleKey, subtitleKey, onMenuClick }: HeaderPro
         </div>
         <div className="hidden lg:block leading-tight">
           <p className="text-sm font-medium text-brand-navy">{t('header.role')}</p>
-          <p className="text-xs text-text-secondary">SAAK International</p>
+          <p className="text-xs text-text-secondary"></p>
         </div>
         <button
           onClick={handleLogout}
