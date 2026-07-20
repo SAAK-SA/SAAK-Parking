@@ -19,6 +19,7 @@ interface ParkingMapProps {
   buildingNameAr?: string;
   interactive?: boolean;
   highlightSlot?: string;
+  onCheckout?: (slot: string) => void | Promise<void>;
 }
 
 export default function ParkingMap({
@@ -27,6 +28,7 @@ export default function ParkingMap({
   buildingNameAr,
   interactive = true,
   highlightSlot,
+  onCheckout,
 }: ParkingMapProps) {
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
@@ -126,7 +128,15 @@ export default function ParkingMap({
 
             {selectedSlot && (
               <div className="w-72 flex-shrink-0">
-                <SlotDetailPanel slot={selectedSlot} onClose={() => setSelectedSlot(null)} />
+                <SlotDetailPanel
+                  slot={selectedSlot}
+                  onClose={() => setSelectedSlot(null)}
+                  onCheckout={
+                    onCheckout
+                      ? async (num) => { await onCheckout(num); setSelectedSlot(null); }
+                      : undefined
+                  }
+                />
               </div>
             )}
           </div>

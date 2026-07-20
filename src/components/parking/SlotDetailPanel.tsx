@@ -1,4 +1,4 @@
-import { X, Car, User, Building2, Hash, Clock, Briefcase } from 'lucide-react';
+import { X, Car, User, Building2, Hash, Clock, Briefcase, LogOut } from 'lucide-react';
 import type { ParkingSlot } from '../../types/parking';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -19,11 +19,13 @@ interface Row {
 interface SlotDetailPanelProps {
   slot: ParkingSlot;
   onClose: () => void;
+  onCheckout?: (slot: string) => void | Promise<void>;
 }
 
-export default function SlotDetailPanel({ slot, onClose }: SlotDetailPanelProps) {
+export default function SlotDetailPanel({ slot, onClose, onCheckout }: SlotDetailPanelProps) {
   const { t } = useLanguage();
   const style = statusStyle[slot.status];
+  const isOccupied = slot.status === 'occupied' || slot.status === 'visitor';
   const buildingName = t(`building.${slot.buildingId}.name`);
 
   const rows: Row[] = [
@@ -78,6 +80,13 @@ export default function SlotDetailPanel({ slot, onClose }: SlotDetailPanelProps)
           <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200 text-center">
             <p className="text-sm font-medium text-green-700">{t('slot.availableMsg')}</p>
           </div>
+        )}
+
+        {onCheckout && isOccupied && (
+          <button onClick={() => onCheckout(slot.number)} className="btn-destructive w-full mt-4 !py-2.5">
+            <LogOut className="w-4 h-4" />
+            {t('pmap.checkout')}
+          </button>
         )}
       </div>
     </div>
