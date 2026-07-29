@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import BuildingSelect from './pages/BuildingSelect';
 import EmployeePortal from './pages/EmployeePortal';
 import VisitorPortal from './pages/VisitorPortal';
+import VisitorGuide from './pages/VisitorGuide';
 
 // Admin auth
 import AdminLogin from './pages/AdminLogin';
@@ -25,6 +26,7 @@ export default function App() {
       <Route path="/building/:buildingId" element={<BuildingSelect />} />
       <Route path="/employee/:buildingId" element={<EmployeePortal />} />
       <Route path="/visitor/:buildingId" element={<VisitorPortal />} />
+      <Route path="/guide" element={<VisitorGuide />} />
 
       {/* ── Admin login ────────────────────────────────────── */}
       <Route path="/admin/login" element={<AdminLogin />} />
