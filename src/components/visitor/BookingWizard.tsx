@@ -302,10 +302,22 @@ export default function BookingWizard({ onBack }: Props) {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#F7F9FC] py-10 px-4">
+    <div className="relative min-h-[calc(100vh-64px)] py-10 px-4 overflow-hidden isolate">
+      {/* Factory background */}
+      <div
+        className="absolute inset-0 -z-10 bg-cover bg-center"
+        style={{ backgroundImage: "url('/factory.JPG')" }}
+      />
+      {/* Legibility overlay: dark tint + soft radial vignette */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0B1B33]/70 via-[#0B1B33]/45 to-[#0B1B33]/75" />
+      <div
+        className="absolute inset-0 -z-10 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at center, rgba(11,27,51,0) 0%, rgba(11,27,51,0.55) 100%)' }}
+      />
+
       <div className="max-w-xl mx-auto">
-        {/* Card container */}
-        <div className="bg-white rounded-[24px] border border-[#E8EDF4] shadow-sm p-6 sm:p-8">
+        {/* Card container — glassy on top of factory image */}
+        <div className="bg-white/95 backdrop-blur-xl rounded-[24px] border border-white/60 shadow-[0_30px_80px_-30px_rgba(11,27,51,0.6)] p-6 sm:p-8">
           <div className="mb-2">
             <h2 className="text-xl font-bold text-[#14396B]">
               {ar ? 'تسجيل زيارة جديدة' : 'New Visit Registration'}
