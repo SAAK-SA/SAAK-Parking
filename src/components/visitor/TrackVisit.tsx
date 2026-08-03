@@ -1,19 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Car, Search, CheckCircle2, Clock, LogOut, Loader2, MapPin, XCircle } from 'lucide-react';
+import { Phone, Car, Search, CheckCircle2, Clock, LogOut, Loader2, MapPin, XCircle, Hash, Calendar, User } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { getSessions, checkoutSlot } from '../../data/db';
-import type { SessionRow } from '../../data/seed';
+import { getVisits, checkoutVisit, type VisitRow } from '../../data/visits';
 
 interface Props {
   embedded?: boolean;
 }
 
-type SearchBy = 'phone' | 'plate';
-
-interface FoundSession extends SessionRow {
-  checkedOut?: boolean;
-}
+type SearchBy = 'phone' | 'plate' | 'number';
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -62,33 +57,31 @@ function TimelineStep({
 
 // ─── Session card ────────────────────────────────────────────────────────────
 
-function SessionCard({ session, ar, onCheckout }: {
-  session: FoundSession; ar: boolean; onCheckout: (slot: string) => void;
+function VisitCard({ visit, ar, onCheckout }: {
+  visit: VisitRow; ar: boolean; onCheckout: (visitNumber: string) => void;
 }) {
   const [busy, setBusy] = useState(false);
-  const isActive = !session.exit_at && !session.checkedOut;
-  const entryTime = formatTime(session.entry_at);
-  const entryDate = formatDate(session.entry_at);
+  const isActive = !visit.checkedOutAt;
+  const createdTime = formatTime(visit.createdAt);
+  const createdDate = formatDate(visit.createdAt);
 
   const steps = ar
     ? [
-        { label: 'تم التسجيل', sublabel: entryDate, done: true, active: false },
-        { label: 'وصول البوابة', sublabel: entryTime, done: true, active: false },
-        { label: 'داخل المنشأة', sublabel: isActive ? undefined : undefined, done: !isActive, active: isActive },
-        { label: 'تسجيل المغادرة', sublabel: session.exit_at ? formatTime(session.exit_at) : undefined, done: !isActive, active: false },
+        { label: 'تم التسجيل', sublabel: `${createdDate} · ${createdTime}`, done: true, active: false },
+        { label: 'في انتظار الوصول', sublabel: undefined, done: !isActive, active: isActive },
+        { label: 'تسجيل المغادرة', sublabel: visit.checkedOutAt ? formatTime(visit.checkedOutAt) : undefined, done: !isActive, active: false },
       ]
     : [
-        { label: 'Registered', sublabel: entryDate, done: true, active: false },
-        { label: 'Gate Arrival', sublabel: entryTime, done: true, active: false },
-        { label: 'In Premises', done: !isActive, active: isActive },
-        { label: 'Checked Out', sublabel: session.exit_at ? formatTime(session.exit_at) : undefined, done: !isActive, active: false },
+        { label: 'Registered', sublabel: `${createdDate} · ${createdTime}`, done: true, active: false },
+        { label: 'Awaiting Arrival', sublabel: undefined, done: !isActive, active: isActive },
+        { label: 'Checked Out', sublabel: visit.checkedOutAt ? formatTime(visit.checkedOutAt) : undefined, done: !isActive, active: false },
       ];
 
   const handleCheckout = async () => {
     setBusy(true);
-    await checkoutSlot(session.slot);
+    checkoutVisit(visit.visitNumber);
     setBusy(false);
-    onCheckout(session.slot);
+    onCheckout(visit.visitNumber);
   };
 
   return (
@@ -100,37 +93,22 @@ function SessionCard({ session, ar, onCheckout }: {
       {/* Header */}
       <div className={`px-5 py-4 border-b border-[#E8EDF4] flex items-center justify-between ${isActive ? 'bg-[#EDF3FB]' : 'bg-[#F7F9FC]'}`}>
         <div>
-          <p className="font-bold text-[#14396B] text-base">{session.name}</p>
-          {session.company && <p className="text-xs text-[#5B6B85] mt-0.5">{session.company}</p>}
+          <p className="font-bold text-[#14396B] text-base">{visit.name}</p>
+          <p className="text-xs text-[#5B6B85] mt-0.5 font-mono" dir="ltr">{visit.visitNumber}</p>
         </div>
         <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${
           isActive ? 'bg-[#12A150]/10 text-[#12A150]' : 'bg-[#94A3B8]/10 text-[#5B6B85]'
         }`}>
           <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#12A150] animate-pulse' : 'bg-[#94A3B8]'}`} />
-          {isActive ? (ar ? 'نشط' : 'Active') : (ar ? 'مغادر' : 'Checked Out')}
+          {isActive ? (ar ? 'نشطة' : 'Active') : (ar ? 'مغادر' : 'Checked Out')}
         </div>
       </div>
 
       {/* Details */}
       <div className="px-5 py-4 grid grid-cols-2 gap-3 border-b border-[#E8EDF4]">
-        <div>
-          <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider mb-1">{ar ? 'رقم الموقف' : 'Parking Spot'}</p>
-          <p className="font-extrabold text-[#14396B] text-xl">{session.slot}</p>
-        </div>
-        <div>
-          <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider mb-1">{ar ? 'رقم اللوحة' : 'Plate'}</p>
-          <p className="font-bold text-[#14396B] text-sm" dir="ltr">{session.plate}</p>
-        </div>
-        <div>
-          <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider mb-1">{ar ? 'وقت الدخول' : 'Entry Time'}</p>
-          <p className="font-medium text-[#5B6B85] text-sm" dir="ltr">{entryTime}</p>
-        </div>
-        {session.exit_at && (
-          <div>
-            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider mb-1">{ar ? 'وقت الخروج' : 'Exit Time'}</p>
-            <p className="font-medium text-[#5B6B85] text-sm" dir="ltr">{formatTime(session.exit_at)}</p>
-          </div>
-        )}
+        <Detail icon={Phone} label={ar ? 'الجوال' : 'Phone'} value={visit.phone} />
+        <Detail icon={Car} label={ar ? 'رقم السيارة' : 'Plate'} value={visit.plate} />
+        <Detail icon={Calendar} label={ar ? 'التاريخ' : 'Date'} value={visit.visitDate} className="col-span-2" />
       </div>
 
       {/* Timeline */}
@@ -160,6 +138,20 @@ function SessionCard({ session, ar, onCheckout }: {
   );
 }
 
+function Detail({ icon: Icon, label, value, className = '' }: {
+  icon: React.ElementType; label: string; value: string; className?: string;
+}) {
+  return (
+    <div className={className}>
+      <div className="flex items-center gap-1.5 text-[10px] text-[#94A3B8] uppercase tracking-wider mb-1">
+        <Icon className="w-3 h-3" />
+        {label}
+      </div>
+      <p className="text-sm font-semibold text-[#14396B]" dir="ltr">{value}</p>
+    </div>
+  );
+}
+
 // ─── Main component ─────────────────────────────────────────────────────────
 
 export default function TrackVisit({ embedded = false }: Props) {
@@ -170,7 +162,10 @@ export default function TrackVisit({ embedded = false }: Props) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
-  const [results, setResults] = useState<FoundSession[]>([]);
+  const [results, setResults] = useState<VisitRow[]>([]);
+  const [all, setAll] = useState<VisitRow[]>([]);
+
+  useEffect(() => { setAll(getVisits()); }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,67 +174,86 @@ export default function TrackVisit({ embedded = false }: Props) {
     setLoading(true);
     setSearched(false);
 
-    const all = await getSessions();
-    const visitors = all.filter((s) => s.kind === 'visitor');
-    const matched = visitors.filter((s) => {
-      if (searchBy === 'phone') return s.mobile?.replace(/\s/g, '').includes(q.replace(/\s/g, ''));
-      return s.plate.replace(/\s/g, '').toLowerCase().includes(q.replace(/\s/g, '').toLowerCase());
+    const list = getVisits();
+    setAll(list);
+
+    const norm = (s: string) => s.replace(/\s/g, '').toLowerCase();
+    const nq = norm(q);
+    const matched = list.filter((v) => {
+      if (searchBy === 'phone')  return norm(v.phone).includes(nq);
+      if (searchBy === 'plate')  return norm(v.plate).includes(nq);
+      return norm(v.visitNumber).includes(nq);
     });
 
-    setResults(matched as FoundSession[]);
+    setResults(matched);
     setLoading(false);
     setSearched(true);
   };
 
-  const handleCheckout = (slot: string) => {
+  const handleCheckout = (visitNumber: string) => {
     setResults((prev) =>
-      prev.map((s) => (s.slot === slot && !s.exit_at ? { ...s, exit_at: new Date().toISOString(), checkedOut: true } : s))
+      prev.map((v) => (v.visitNumber === visitNumber && !v.checkedOutAt
+        ? { ...v, checkedOutAt: new Date().toISOString() }
+        : v))
     );
   };
 
-  const Icon = searchBy === 'phone' ? Phone : Car;
+  const IconForField = searchBy === 'phone' ? Phone : searchBy === 'plate' ? Car : Hash;
   const placeholder = searchBy === 'phone'
-    ? (ar ? '05xxxxxxxx' : '05xxxxxxxx')
-    : (ar ? 'أ ب ج ١٢٣٤' : 'ABC 1234');
+    ? '05xxxxxxxx'
+    : searchBy === 'plate'
+    ? (ar ? 'أ ب ج ١٢٣٤' : 'ABC 1234')
+    : 'VST-XXXX-XXXX';
+
+  const activeCount = all.filter((v) => !v.checkedOutAt).length;
 
   return (
     <div className={embedded ? '' : 'min-h-[calc(100vh-64px)] bg-[#F7F9FC] py-10 px-4'}>
       <div className={embedded ? 'max-w-2xl' : 'max-w-xl mx-auto'}>
         {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-[14px] bg-[#EDF3FB] flex items-center justify-center">
               <MapPin className="w-5 h-5 text-[#14396B]" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-[#14396B]">{ar ? 'تتبع زيارة' : 'Track Visit'}</h2>
-              <p className="text-sm text-[#94A3B8]">{ar ? 'ابحث بالجوال أو رقم اللوحة' : 'Search by phone or plate number'}</p>
+              <p className="text-sm text-[#94A3B8]">
+                {ar ? 'ابحث بالجوال أو رقم اللوحة أو رقم الزيارة' : 'Search by phone, plate, or visit number'}
+              </p>
             </div>
           </div>
+          {all.length > 0 && (
+            <div className="hidden sm:block text-end">
+              <p className="text-2xl font-extrabold text-[#12A150] leading-none">{activeCount}</p>
+              <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider mt-1">{ar ? 'زيارة نشطة' : 'Active'}</p>
+            </div>
+          )}
         </div>
 
         {/* Search card */}
         <div className="bg-white rounded-[20px] border border-[#E8EDF4] shadow-sm p-5 mb-5">
-          {/* Toggle */}
-          <div className="flex bg-[#F7F9FC] rounded-[14px] p-1 mb-4">
-            {(['phone', 'plate'] as SearchBy[]).map((type) => (
+          <div className="grid grid-cols-3 bg-[#F7F9FC] rounded-[14px] p-1 mb-4 gap-1">
+            {(['phone', 'plate', 'number'] as SearchBy[]).map((type) => (
               <button
                 key={type}
                 onClick={() => { setSearchBy(type); setQuery(''); setSearched(false); }}
-                className={`flex-1 flex items-center justify-center gap-2 h-9 rounded-[10px] text-sm font-semibold transition-all duration-200 ${
+                className={`flex items-center justify-center gap-1.5 h-9 rounded-[10px] text-xs sm:text-sm font-semibold transition-all duration-200 ${
                   searchBy === type ? 'bg-white text-[#14396B] shadow-sm' : 'text-[#94A3B8] hover:text-[#5B6B85]'
                 }`}
               >
-                {type === 'phone' ? <Phone className="w-3.5 h-3.5" /> : <Car className="w-3.5 h-3.5" />}
-                {type === 'phone' ? (ar ? 'رقم الجوال' : 'Phone') : (ar ? 'رقم اللوحة' : 'Plate')}
+                {type === 'phone'
+                  ? <><Phone className="w-3.5 h-3.5" />{ar ? 'الجوال' : 'Phone'}</>
+                  : type === 'plate'
+                  ? <><Car className="w-3.5 h-3.5" />{ar ? 'اللوحة' : 'Plate'}</>
+                  : <><Hash className="w-3.5 h-3.5" />{ar ? 'رقم الزيارة' : 'Visit №'}</>}
               </button>
             ))}
           </div>
 
-          {/* Search form */}
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
-              <Icon className="absolute top-1/2 start-4 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
+              <IconForField className="absolute top-1/2 start-4 -translate-y-1/2 w-4 h-4 text-[#94A3B8] pointer-events-none" />
               <input
                 type={searchBy === 'phone' ? 'tel' : 'text'}
                 value={query}
@@ -273,9 +287,7 @@ export default function TrackVisit({ embedded = false }: Props) {
                   </div>
                   <p className="font-semibold text-[#14396B] mb-1">{ar ? 'لا توجد نتائج' : 'No results found'}</p>
                   <p className="text-sm text-[#94A3B8]">
-                    {ar
-                      ? 'تأكد من صحة البيانات المدخلة وحاول مجدداً'
-                      : 'Please check the information and try again'}
+                    {ar ? 'تأكد من صحة البيانات المدخلة وحاول مجدداً' : 'Please check the information and try again'}
                   </p>
                 </div>
               ) : (
@@ -283,8 +295,8 @@ export default function TrackVisit({ embedded = false }: Props) {
                   <p className="text-xs text-[#94A3B8] px-1">
                     {results.length} {ar ? 'نتيجة' : results.length === 1 ? 'result' : 'results'}
                   </p>
-                  {results.map((s) => (
-                    <SessionCard key={s.id} session={s} ar={ar} onCheckout={handleCheckout} />
+                  {results.map((v) => (
+                    <VisitCard key={v.id} visit={v} ar={ar} onCheckout={handleCheckout} />
                   ))}
                 </div>
               )}
@@ -292,17 +304,47 @@ export default function TrackVisit({ embedded = false }: Props) {
           )}
         </AnimatePresence>
 
-        {/* Help note */}
-        {!searched && (
+        {/* Recent list (admin embedded only) — quick glance */}
+        {embedded && !searched && all.length > 0 && (
+          <div className="mt-2">
+            <div className="flex items-center justify-between mb-3 px-1">
+              <p className="text-xs text-[#94A3B8] uppercase tracking-wider font-semibold">
+                {ar ? 'آخر الزيارات' : 'Recent Visits'}
+              </p>
+              <p className="text-xs text-[#94A3B8]">{all.length} {ar ? 'إجمالي' : 'total'}</p>
+            </div>
+            <div className="space-y-4">
+              {all.slice(0, 6).map((v) => (
+                <VisitCard key={v.id} visit={v} ar={ar} onCheckout={handleCheckout} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Help note (visitor-facing only) */}
+        {!searched && !embedded && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
             className="flex items-start gap-3 p-4 bg-[#EDF3FB] rounded-[16px] border border-[#C8DDEF]">
             <Clock className="w-4 h-4 text-[#14396B] flex-shrink-0 mt-0.5" />
             <p className="text-xs text-[#5B6B85] leading-relaxed">
               {ar
-                ? 'أدخل رقم جوالك أو رقم لوحة مركبتك للاطلاع على حالة زيارتك الحالية أو السابقة.'
-                : 'Enter your phone or vehicle plate number to view the status of your current or past visit.'}
+                ? 'أدخل رقم جوالك أو رقم لوحة مركبتك أو رقم الزيارة للاطلاع على حالة زيارتك.'
+                : 'Enter your phone, plate, or visit number to view the status of your visit.'}
             </p>
           </motion.div>
+        )}
+
+        {/* Empty state (admin) */}
+        {embedded && !searched && all.length === 0 && (
+          <div className="bg-white rounded-[20px] border border-[#E8EDF4] shadow-sm p-10 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-[#F7F9FC] flex items-center justify-center mx-auto mb-4">
+              <User className="w-7 h-7 text-[#C4CDD8]" />
+            </div>
+            <p className="font-semibold text-[#14396B] mb-1">{ar ? 'لا توجد زيارات بعد' : 'No visits yet'}</p>
+            <p className="text-sm text-[#94A3B8]">
+              {ar ? 'ستظهر الزيارات هنا فور تسجيل أول زائر' : 'Visits will appear here once someone registers'}
+            </p>
+          </div>
         )}
       </div>
     </div>

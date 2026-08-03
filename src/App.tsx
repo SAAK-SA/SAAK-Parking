@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // Public
 import VisitorPortal from './pages/VisitorPortal';
 import VisitorGuide from './pages/VisitorGuide';
+import VisitStatus from './pages/VisitStatus';
 
 // Admin auth
 import AdminLogin from './pages/AdminLogin';
@@ -20,6 +21,7 @@ export default function App() {
     <Routes>
       {/* ── Public routes (no sidebar) ─────────────────────── */}
       <Route path="/" element={<VisitorPortal />} />
+      <Route path="/visit/:visitNumber" element={<VisitStatus />} />
       <Route path="/guide" element={<VisitorGuide />} />
 
       {/* Legacy paths → visitor portal */}
