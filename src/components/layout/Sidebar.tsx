@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Map, Car, Users, BarChart3, Settings,
+  LayoutDashboard, Map, Car, BarChart3, Settings,
   Bell, LogOut, UserCheck, X, ArrowLeftRight,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -11,7 +11,6 @@ const navItems = [
   { to: '/admin', icon: LayoutDashboard, key: 'nav.dashboard' },
   { to: '/admin/map', icon: Map, key: 'nav.map' },
   { to: '/admin/vehicles', icon: Car, key: 'nav.vehicles' },
-  { to: '/admin/employees', icon: Users, key: 'nav.employees' },
   { to: '/admin/visitors', icon: UserCheck, key: 'nav.visitors' },
   { to: '/admin/reports', icon: BarChart3, key: 'nav.reports' },
 ];

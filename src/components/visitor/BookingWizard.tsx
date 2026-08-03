@@ -255,17 +255,18 @@ export default function BookingWizard({ onBack }: Props) {
     goNext();
   };
 
+  const handleReset = () => {
+    setData(EMPTY); setErrors({}); setSlot(''); setVisitNumber('');
+    setIsFull(false); setStep(0); setDir(1);
+  };
+
   const handleCheckout = async () => {
     if (!slot || busy) return;
     setBusy(true);
     await checkoutSlot(slot);
     setBusy(false);
+    handleReset();
     onBack();
-  };
-
-  const handleReset = () => {
-    setData(EMPTY); setErrors({}); setSlot(''); setVisitNumber('');
-    setIsFull(false); setStep(0); setDir(1);
   };
 
   const purposeOptions = ar
@@ -303,15 +304,6 @@ export default function BookingWizard({ onBack }: Props) {
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#F7F9FC] py-10 px-4">
       <div className="max-w-xl mx-auto">
-        {/* Back */}
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-sm text-[#5B6B85] hover:text-[#14396B] mb-6 transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          {ar ? 'رجوع' : 'Back'}
-        </button>
-
         {/* Card container */}
         <div className="bg-white rounded-[24px] border border-[#E8EDF4] shadow-sm p-6 sm:p-8">
           <div className="mb-2">
