@@ -11,7 +11,6 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Admin (protected)
 import Dashboard from './pages/Dashboard';
-import ParkingMapPage from './pages/ParkingMapPage';
 import DailyReport from './pages/DailyReport';
 import AdminTrackVisit from './pages/AdminTrackVisit';
 import Placeholder from './pages/Placeholder';
@@ -34,7 +33,6 @@ export default function App() {
 
       {/* ── Admin routes (protected + sidebar) ─────────────── */}
       <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/admin/map" element={<ProtectedRoute><ParkingMapPage /></ProtectedRoute>} />
       <Route path="/admin/vehicles" element={<ProtectedRoute><Placeholder titleKey="nav.vehicles" /></ProtectedRoute>} />
       <Route path="/admin/visitors" element={<ProtectedRoute><AdminTrackVisit /></ProtectedRoute>} />
       <Route path="/admin/reports" element={<ProtectedRoute><DailyReport /></ProtectedRoute>} />
