@@ -79,7 +79,7 @@ function VisitCard({ visit, ar, onCheckout }: {
 
   const handleCheckout = async () => {
     setBusy(true);
-    checkoutVisit(visit.visitNumber);
+    await checkoutVisit(visit.visitNumber);
     setBusy(false);
     onCheckout(visit.visitNumber);
   };
@@ -165,7 +165,7 @@ export default function TrackVisit({ embedded = false }: Props) {
   const [results, setResults] = useState<VisitRow[]>([]);
   const [all, setAll] = useState<VisitRow[]>([]);
 
-  useEffect(() => { setAll(getVisits()); }, []);
+  useEffect(() => { getVisits().then(setAll); }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,7 +174,7 @@ export default function TrackVisit({ embedded = false }: Props) {
     setLoading(true);
     setSearched(false);
 
-    const list = getVisits();
+    const list = await getVisits();
     setAll(list);
 
     const norm = (s: string) => s.replace(/\s/g, '').toLowerCase();

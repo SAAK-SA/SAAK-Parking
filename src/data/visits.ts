@@ -1,7 +1,14 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Visit registrations (single-page form, no slot assignment).
-// Stored in localStorage. Independent of the parking_sessions data model.
+//
+// Uses Supabase (shared, cross-device) when VITE_SUPABASE_URL /
+// VITE_SUPABASE_ANON_KEY are configured — required for the QR code / visit
+// status page to work when scanned from a different device than the one
+// that registered the visit. Falls back to localStorage (single-device
+// only) when Supabase isn't configured.
 // ─────────────────────────────────────────────────────────────────────────────
+
+import { isCloud, sbSelect, sbInsert, sbUpdate } from '../lib/cloud';
 
 export interface VisitRow {
   id: string;
@@ -23,14 +30,14 @@ export interface VisitInput {
 
 const LS_KEY = 'saak_visits_v1';
 
-function load(): VisitRow[] {
+function loadLocal(): VisitRow[] {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (raw) return JSON.parse(raw) as VisitRow[];
   } catch { /* ignore */ }
   return [];
 }
-function save(rows: VisitRow[]): void {
+function saveLocal(rows: VisitRow[]): void {
   try { localStorage.setItem(LS_KEY, JSON.stringify(rows)); } catch { /* ignore */ }
 }
 
@@ -42,11 +49,51 @@ function genVisitNumber(): string {
   return `VST-${mm}${yy}-${seq}`;
 }
 
-export function registerVisit(input: VisitInput): VisitRow {
-  const rows = load();
+// ── Cloud row shape (snake_case columns) ────────────────────────────────────
+
+interface CloudVisitRow {
+  id: string;
+  visit_number: string;
+  name: string;
+  phone: string;
+  plate: string;
+  visit_date: string;
+  created_at: string;
+  checked_out_at: string | null;
+}
+
+function fromCloud(r: CloudVisitRow): VisitRow {
+  return {
+    id: r.id,
+    visitNumber: r.visit_number,
+    name: r.name,
+    phone: r.phone,
+    plate: r.plate,
+    visitDate: r.visit_date,
+    createdAt: r.created_at,
+    checkedOutAt: r.checked_out_at,
+  };
+}
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+export async function registerVisit(input: VisitInput): Promise<VisitRow> {
+  const visitNumber = genVisitNumber();
+
+  if (isCloud) {
+    const row = await sbInsert<CloudVisitRow>('visits', {
+      visit_number: visitNumber,
+      name: input.name.trim(),
+      phone: input.phone.trim(),
+      plate: input.plate.trim(),
+      visit_date: input.visitDate,
+    });
+    return fromCloud(row);
+  }
+
   const row: VisitRow = {
     id: `V${Date.now()}${Math.floor(Math.random() * 1000)}`,
-    visitNumber: genVisitNumber(),
+    visitNumber,
     name: input.name.trim(),
     phone: input.phone.trim(),
     plate: input.plate.trim(),
@@ -54,24 +101,40 @@ export function registerVisit(input: VisitInput): VisitRow {
     createdAt: new Date().toISOString(),
     checkedOutAt: null,
   };
+  const rows = loadLocal();
   rows.push(row);
-  save(rows);
+  saveLocal(rows);
   return row;
 }
 
-export function getVisits(): VisitRow[] {
-  return load().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function getVisits(): Promise<VisitRow[]> {
+  if (isCloud) {
+    const rows = await sbSelect<CloudVisitRow>('visits', 'order=created_at.desc');
+    return rows.map(fromCloud);
+  }
+  return loadLocal().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function getVisitByNumber(visitNumber: string): VisitRow | undefined {
-  return load().find((v) => v.visitNumber.toLowerCase() === visitNumber.trim().toLowerCase());
+export async function getVisitByNumber(visitNumber: string): Promise<VisitRow | undefined> {
+  const q = visitNumber.trim();
+  if (isCloud) {
+    const rows = await sbSelect<CloudVisitRow>('visits', `visit_number=ilike.${encodeURIComponent(q)}&limit=1`);
+    return rows[0] ? fromCloud(rows[0]) : undefined;
+  }
+  return loadLocal().find((v) => v.visitNumber.toLowerCase() === q.toLowerCase());
 }
 
-export function checkoutVisit(visitNumber: string): void {
-  const rows = load();
+export async function checkoutVisit(visitNumber: string): Promise<void> {
+  if (isCloud) {
+    await sbUpdate('visits', `visit_number=eq.${encodeURIComponent(visitNumber)}&checked_out_at=is.null`, {
+      checked_out_at: new Date().toISOString(),
+    });
+    return;
+  }
+  const rows = loadLocal();
   const row = rows.find((v) => v.visitNumber === visitNumber);
   if (row && !row.checkedOutAt) {
     row.checkedOutAt = new Date().toISOString();
-    save(rows);
+    saveLocal(rows);
   }
 }

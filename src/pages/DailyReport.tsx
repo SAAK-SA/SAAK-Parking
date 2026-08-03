@@ -24,8 +24,9 @@ export default function DailyReport() {
   const [visits, setVisits] = useState<VisitRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(() => {
-    setVisits(getVisits().filter((v) => isToday(v.createdAt)));
+  const refresh = useCallback(async () => {
+    const all = await getVisits();
+    setVisits(all.filter((v) => isToday(v.createdAt)));
     setLoading(false);
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
@@ -33,9 +34,9 @@ export default function DailyReport() {
   const inside = visits.filter((v) => !v.checkedOutAt).length;
   const exited = visits.filter((v) => v.checkedOutAt).length;
 
-  const handleCheckout = (visitNumber: string) => {
-    checkoutVisit(visitNumber);
-    refresh();
+  const handleCheckout = async (visitNumber: string) => {
+    await checkoutVisit(visitNumber);
+    await refresh();
   };
 
   const kpis = [

@@ -123,7 +123,7 @@ export default function BookingWizard(_: Props) {
     e.preventDefault();
     if (!validate() || busy) return;
     setBusy(true);
-    const row = registerVisit(data);
+    const row = await registerVisit(data);
     setBusy(false);
     setVisit(row);
   };
@@ -135,9 +135,9 @@ export default function BookingWizard(_: Props) {
     setCheckedOut(false);
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!visit) return;
-    checkoutVisit(visit.visitNumber);
+    await checkoutVisit(visit.visitNumber);
     setCheckedOut(true);
   };
 

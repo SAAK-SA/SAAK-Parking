@@ -20,8 +20,13 @@ export default function VisitStatus() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setVisit(getVisitByNumber(visitNumber) ?? null);
-    setLoaded(true);
+    let cancelled = false;
+    getVisitByNumber(visitNumber).then((v) => {
+      if (cancelled) return;
+      setVisit(v ?? null);
+      setLoaded(true);
+    });
+    return () => { cancelled = true; };
   }, [visitNumber]);
 
   const isActive = visit && !visit.checkedOutAt;
