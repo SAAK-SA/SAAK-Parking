@@ -22,16 +22,16 @@ export default function Dashboard() {
   const [visits, setVisits] = useState<VisitRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(() => {
-    setVisits(getVisits());
+  const refresh = useCallback(async () => {
+    setVisits(await getVisits());
     setLoading(false);
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  const handleCheckout = (visitNumber: string) => {
-    checkoutVisit(visitNumber);
-    refresh();
+  const handleCheckout = async (visitNumber: string) => {
+    await checkoutVisit(visitNumber);
+    await refresh();
   };
 
   const todayVisits = visits.filter((v) => isToday(v.createdAt));
