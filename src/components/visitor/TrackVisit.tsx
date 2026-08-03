@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Car, Search, CheckCircle2, Clock, LogOut, Loader2, ChevronLeft, MapPin, XCircle } from 'lucide-react';
+import { Phone, Car, Search, CheckCircle2, Clock, LogOut, Loader2, MapPin, XCircle } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { getSessions, checkoutSlot } from '../../data/db';
 import type { SessionRow } from '../../data/seed';
 
 interface Props {
-  onBack: () => void;
+  embedded?: boolean;
 }
 
 type SearchBy = 'phone' | 'plate';
@@ -162,7 +162,7 @@ function SessionCard({ session, ar, onCheckout }: {
 
 // ─── Main component ─────────────────────────────────────────────────────────
 
-export default function TrackVisit({ onBack }: Props) {
+export default function TrackVisit({ embedded = false }: Props) {
   const { lang } = useLanguage();
   const ar = lang === 'ar';
 
@@ -203,17 +203,8 @@ export default function TrackVisit({ onBack }: Props) {
     : (ar ? 'أ ب ج ١٢٣٤' : 'ABC 1234');
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-[#F7F9FC] py-10 px-4">
-      <div className="max-w-xl mx-auto">
-        {/* Back */}
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-sm text-[#5B6B85] hover:text-[#14396B] mb-6 transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          {ar ? 'رجوع' : 'Back'}
-        </button>
-
+    <div className={embedded ? '' : 'min-h-[calc(100vh-64px)] bg-[#F7F9FC] py-10 px-4'}>
+      <div className={embedded ? 'max-w-2xl' : 'max-w-xl mx-auto'}>
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">

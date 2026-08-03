@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
+import { isAllowedAdmin } from '../data/adminUsers';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -16,7 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const login = (username: string, password: string): boolean => {
-    if (username === 'admin' && password === 'SAAK2024') {
+    if (isAllowedAdmin(username, password)) {
       localStorage.setItem(STORAGE_KEY, 'true');
       setIsAuthenticated(true);
       return true;

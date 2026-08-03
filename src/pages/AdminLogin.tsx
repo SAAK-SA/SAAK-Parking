@@ -67,8 +67,8 @@ export default function AdminLogin() {
                   type="text"
                   value={username}
                   onChange={(e) => { setUsername(e.target.value); setError(''); }}
-                  placeholder="admin"
                   dir="ltr"
+                  autoComplete="username"
                   className="field ps-10"
                 />
               </div>
