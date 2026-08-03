@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Map, Car, BarChart3, Settings,
+  LayoutDashboard, Car, BarChart3, Settings,
   Bell, LogOut, UserCheck, X, ArrowLeftRight,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -9,7 +9,6 @@ import Logo from '../brand/Logo';
 
 const navItems = [
   { to: '/admin', icon: LayoutDashboard, key: 'nav.dashboard' },
-  { to: '/admin/map', icon: Map, key: 'nav.map' },
   { to: '/admin/vehicles', icon: Car, key: 'nav.vehicles' },
   { to: '/admin/visitors', icon: UserCheck, key: 'nav.visitors' },
   { to: '/admin/reports', icon: BarChart3, key: 'nav.reports' },
